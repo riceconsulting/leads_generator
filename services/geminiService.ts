@@ -197,15 +197,6 @@ const createLeadDetailPrompt = (params: LeadGenerationParams, companyName: strin
         emailTemplate, whatsappTemplate
     } = params;
     
-    // This section creates placeholders if user input is blank.
-    // The prompt explicitly tells the AI to use these placeholders verbatim if it sees them.
-    const finalSenderName = senderName || '';
-    const finalSenderTitle = senderTitle || '';
-    const finalItCompanyName = itCompanyName || '';
-    const finalItCompanyWebsite = itCompanyWebsite || '';
-    const finalItCompanyPhone = itCompanyPhone || '';
-    const finalItCompanyEmail = itCompanyEmail || '';
-
     const customResearchInstruction = customResearch
         ? `
 **CUSTOM DEEP DIVE RESEARCH**:
@@ -256,6 +247,20 @@ You must use your best judgment to apply these labels. If the user specified a t
     * The goal is to start a conversation. Keep it under 3 sentences.
 `;
 
+    // Dynamically construct the sender signature details to ensure empty fields are omitted from the prompt.
+    const signatureParts = [];
+    if (senderName) signatureParts.push(`*   Sender Name: ${senderName}`);
+    if (senderTitle) signatureParts.push(`*   Sender Title: ${senderTitle}`);
+    if (itCompanyName) signatureParts.push(`*   Company: ${itCompanyName}`);
+    if (itCompanyWebsite) signatureParts.push(`*   Website: ${itCompanyWebsite}`);
+    if (itCompanyPhone) signatureParts.push(`*   Phone: ${itCompanyPhone}`);
+    if (itCompanyEmail) signatureParts.push(`*   Email: ${itCompanyEmail}`);
+
+    const senderSignatureRule = signatureParts.length > 0
+        ? `The email signature MUST be constructed using ONLY the details provided below. If a detail is missing from this list, you MUST omit that line from the signature. **DO NOT replace blank details with placeholders or fictional information.**
+            ${signatureParts.join('\n            ')}`
+        : 'No sender details have been provided. Therefore, you MUST NOT generate any signature block in the email body.';
+
     return `
         You are a world-class AI Business Intelligence Analyst. Your mission is to conduct a meticulous, in-depth investigation of a single company, "${companyName}", using Google Search. Your primary objective is to uncover **accurate contact information for a key decision-maker** and to generate a comprehensive, high-quality business profile. Accuracy, verification, and lead quality are paramount.
 
@@ -281,13 +286,7 @@ You must use your best judgment to apply these labels. If the user specified a t
         4.  ${customResearchInstruction}
 
         **Phase 4: Personalized Outreach Generation in ${language}**
-        1.  **SENDER SIGNATURE RULE**: The email signature MUST be constructed using the details below. If a detail is blank or an empty string, you MUST omit that line from the signature. **DO NOT replace blank details with placeholders or fictional information.**
-            *   Sender Name: ${finalSenderName}
-            *   Sender Title: ${finalSenderTitle}
-            *   Company: ${finalItCompanyName}
-            *   Website: ${finalItCompanyWebsite}
-            *   Phone: ${finalItCompanyPhone}
-            *   Email: ${finalItCompanyEmail}
+        1.  **SENDER SIGNATURE RULE**: ${senderSignatureRule}
         2.  ${emailTemplateInstruction}
         3.  ${whatsappTemplateInstruction}
 
