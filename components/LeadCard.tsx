@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BusinessLead } from '../types';
-import { BuildingIcon, MailIcon, PhoneIcon, GlobeIcon, CheckCircleIcon, XCircleIcon, MessageSquareIcon, SaveIcon, UserIcon, FileTextIcon } from './icons';
+import { BuildingIcon, MailIcon, PhoneIcon, GlobeIcon, CheckCircleIcon, XCircleIcon, MessageSquareIcon, SaveIcon, UserIcon, FileTextIcon, ChevronDownIcon } from './icons';
+import CopyButton from './CopyButton';
 
 interface LeadCardProps {
   lead: BusinessLead;
@@ -21,11 +22,56 @@ const InfoItem: React.FC<{ icon: React.ReactNode; label: string; value: React.Re
     </div>
 );
 
+const CollapsibleList: React.FC<{ items: string[] }> = ({ items }) => {
+    const [isListExpanded, setIsListExpanded] = useState(false);
+  
+    if (items.length === 0) {
+      return <>Not Found</>;
+    }
+  
+    if (items.length === 1) {
+      return <>{items[0]}</>;
+    }
+  
+    if (isListExpanded) {
+      return (
+        <div className="flex flex-col items-start">
+          <div className="space-y-1">
+            {items.map((item, index) => <div key={index}>{item}</div>)}
+          </div>
+          <button 
+            onClick={() => setIsListExpanded(false)} 
+            className="text-xs text-primary-dark dark:text-primary-light hover:underline mt-1 focus:outline-none font-medium"
+            aria-label="Show less contact information"
+          >
+            Show less
+          </button>
+        </div>
+      );
+    }
+  
+    return (
+      <div className="flex items-center flex-wrap">
+        <span>{items[0]}</span>
+        <button 
+          onClick={() => setIsListExpanded(true)} 
+          className="ml-2 text-xs text-primary-dark dark:text-primary-light hover:underline whitespace-nowrap focus:outline-none font-medium"
+          aria-label={`Show ${items.length - 1} more contact entries`}
+        >
+          (...and {items.length - 1} more)
+        </button>
+      </div>
+    );
+};
+
 const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCard }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const contact = lead.contactPerson;
   // Ensure contactEmail and contactPhone are always arrays to prevent .join() errors
   const emails = Array.isArray(lead.contactEmail) ? lead.contactEmail : (lead.contactEmail ? [String(lead.contactEmail)] : []);
   const phones = Array.isArray(lead.contactPhone) ? lead.contactPhone : (lead.contactPhone ? [String(lead.contactPhone)] : []);
+  
+  const fullEmailText = `Subject: ${lead.draftEmail.subject || ''}\n\n${lead.draftEmail.body || ''}`;
 
 
   const ResearchFindings = () => {
@@ -115,28 +161,28 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
                 )}
             </button>
         </div>
-
-
-        <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">{lead.companyDescription}</p>
-
-        <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-            <InfoItem icon={<GlobeIcon />} label="Website" value={lead.officialWebsite} isLink={true} href={lead.officialWebsite}/>
-            <InfoItem 
-                icon={<UserIcon />} 
-                label="Key Contact" 
-                value={contact && contact.name !== 'Not Found' ? `${contact.name} (${contact.title})` : 'Not Found'} 
-            />
-            <InfoItem icon={<MailIcon />} label="Contact Emails" value={emails.length > 0 ? emails.join(', ') : 'Not Found'} />
-            <InfoItem icon={<PhoneIcon />} label="Contact Phones" value={phones.length > 0 ? phones.join(', ') : 'Not Found'} />
-            <InfoItem icon={<MessageSquareIcon />} label="WhatsApp Number" value={lead.contactWhatsApp || 'Not Found'} />
-            <InfoItem icon={<BuildingIcon />} label="Est. Employees" value={lead.estimatedEmployeeCount} />
-        </dl>
-        
-        <ResearchFindings />
-        
+        <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{lead.companyDescription}</p>
       </div>
-      
-      <div className="bg-background-light dark:bg-surface-dark/50 p-6 space-y-6">
+
+      {/* Collapsible Section */}
+      <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[3000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="px-6 pb-6 border-t border-border-light dark:border-border-dark">
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 pt-6">
+                <InfoItem icon={<GlobeIcon />} label="Website" value={lead.officialWebsite} isLink={true} href={lead.officialWebsite}/>
+                <InfoItem 
+                    icon={<UserIcon />} 
+                    label="Key Contact" 
+                    value={contact && contact.name !== 'Not Found' ? `${contact.name} (${contact.title})` : 'Not Found'} 
+                />
+                <InfoItem icon={<MailIcon />} label="Contact Emails" value={<CollapsibleList items={emails} />} />
+                <InfoItem icon={<PhoneIcon />} label="Contact Phones" value={<CollapsibleList items={phones} />} />
+                <InfoItem icon={<MessageSquareIcon />} label="WhatsApp Number" value={lead.contactWhatsApp || 'Not Found'} />
+                <InfoItem icon={<BuildingIcon />} label="Est. Employees" value={lead.estimatedEmployeeCount} />
+            </dl>
+            <ResearchFindings />
+        </div>
+        
+        <div className="bg-background-light dark:bg-surface-dark/50 p-6 space-y-6">
           {/* Email Draft */}
           <div>
             <div className="flex justify-between items-center mb-2">
@@ -144,6 +190,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
                     <MailIcon className="h-5 w-5 mr-2" />
                     Draft Email ({lead.draftEmail.tone})
                 </h4>
+                <CopyButton textToCopy={fullEmailText} />
             </div>
             <div className="p-4 bg-surface-light dark:bg-border-dark rounded-lg border border-border-light dark:border-border-dark text-sm">
                 <p className="font-semibold text-text-primary-light dark:text-text-primary-dark">Subject: {lead.draftEmail.subject}</p>
@@ -159,11 +206,21 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
                     <MessageSquareIcon className="h-5 w-5 mr-2" />
                     Draft WhatsApp ({lead.draftWhatsApp.tone})
                 </h4>
+                <CopyButton textToCopy={lead.draftWhatsApp.body} />
             </div>
               <div className="p-4 bg-surface-light dark:bg-border-dark rounded-lg border border-border-light dark:border-border-dark text-sm">
                 <p className="whitespace-pre-wrap text-text-secondary-light dark:text-text-secondary-dark">{lead.draftWhatsApp.body}</p>
             </div>
           </div>
+        </div>
+      </div>
+      
+      {/* Toggle Button in the footer of the card */}
+      <div className="border-t border-border-light dark:border-border-dark bg-surface-light/80 dark:bg-surface-dark/80 px-6 py-2">
+            <button onClick={() => setIsExpanded(!isExpanded)} className="w-full flex justify-center items-center text-sm font-semibold text-primary-dark dark:text-primary-light hover:underline focus:outline-none focus:ring-2 focus:ring-primary-light rounded">
+                <span>{isExpanded ? 'Show Less' : 'View Full Details & Drafts'}</span>
+                <ChevronDownIcon className={`h-5 w-5 ml-2 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+            </button>
       </div>
     </div>
   );
