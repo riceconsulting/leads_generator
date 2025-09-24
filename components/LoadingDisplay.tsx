@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BotIcon } from './icons';
 
 interface LoadingDisplayProps {
@@ -6,42 +6,30 @@ interface LoadingDisplayProps {
   progress: number;
 }
 
-const Typewriter: React.FC<{ text: string }> = ({ text }) => {
-  const [displayedText, setDisplayedText] = useState('');
-
-  useEffect(() => {
-    setDisplayedText(''); // Reset when text changes
-    let i = 0;
-    const intervalId = setInterval(() => {
-      if (i < text.length) {
-        setDisplayedText(prev => prev + text.charAt(i));
-        i++;
-      } else {
-        clearInterval(intervalId);
-      }
-    }, 25); // Adjust speed of typing here
-
-    return () => clearInterval(intervalId);
-  }, [text]);
-
-  return <span>{displayedText}</span>;
-};
-
 const LoadingDisplay: React.FC<LoadingDisplayProps> = ({ status, progress }) => {
   const showDeterminate = progress > 0;
 
   return (
     <div id="loading-display-container" className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-lg flex flex-col items-center justify-center text-center mb-24">
-      <BotIcon className="h-12 w-12 text-primary-light dark:text-primary-dark animate-bounce" />
+      {/* Swapped bounce for pulse animation, which is more subtle and less distracting */}
+      <BotIcon className="h-12 w-12 text-primary-light dark:text-primary-dark animate-pulse" />
       <h3 className="mt-4 text-lg font-medium text-text-primary-light dark:text-text-primary-dark">
         AI is at work...
       </h3>
-      <p className="mt-1 text-sm text-text-secondary-light dark:text-text-secondary-dark h-10 flex items-center justify-center">
-        <Typewriter text={status || 'Initializing process...'} />
+      {/* 
+        Removed the problematic Typewriter effect.
+        Now using a simple paragraph with a key. The key forces a re-render when the status text changes,
+        which re-triggers the 'animate-fade-in' animation for a smooth and reliable transition.
+      */}
+      <p 
+        key={status}
+        className="mt-1 text-sm text-text-secondary-light dark:text-text-secondary-dark min-h-[2.5rem] flex items-center justify-center animate-fade-in"
+      >
+        {status || 'Initializing process...'}
       </p>
 
       {showDeterminate && (
-        <p className="text-sm font-semibold text-primary-light dark:text-primary-dark mt-2">
+        <p className="text-sm font-semibold text-primary-light dark:text-primary-dark mt-2 animate-fade-in">
             {Math.round(progress)}%
         </p>
       )}
@@ -62,23 +50,11 @@ const LoadingDisplay: React.FC<LoadingDisplayProps> = ({ status, progress }) => 
             </div>
         )}
       </div>
+       {/* Cleaned up inline styles, as 'animate-pulse' and 'animate-fade-in' are handled by Tailwind config. */}
       <style>{`
         @keyframes progress-indeterminate {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
-        }
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(-15%);
-                animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-            }
-            50% {
-                transform: translateY(0);
-                animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-            }
-        }
-        .animate-bounce {
-            animation: bounce 1s infinite;
         }
       `}</style>
     </div>

@@ -36,10 +36,11 @@ const researchFocusOptions = [
     {
         category: "Business & Strategy",
         options: [
+            { value: 'General Business SWOT Analysis', prompt: 'Perform a comprehensive SWOT (Strengths, Weaknesses, Opportunities, Threats) analysis of the company\'s overall business. Focus on market position, product/service offerings, and customer reviews. The results should be categorized and placed into keyStrengthsIT (as Strengths) and keyWeaknessesIT (as Weaknesses).' },
+            { value: 'General IT SWOT Analysis', prompt: 'Perform a comprehensive SWOT (Strengths, Weaknesses, Opportunities, Threats) analysis of the company\'s overall IT and digital presence. The results should be categorized and placed into keyStrengthsIT and keyWeaknessesIT.' },
             { value: 'Hiring Trends & Technology Stack', prompt: 'Analyze recent job postings to understand hiring trends and the technologies they are investing in. This provides clues about their internal tech stack (e.g., programming languages, frameworks, databases).' },
             { value: 'Recent Company News & Funding Events', prompt: "Find recent news, press releases, or blog posts. Look for announcements about expansion, new products, funding rounds, or leadership changes that could be used as a conversation starter. Summarize in 'customResearchResults'." },
             { value: 'Key Competitor Digital Analysis', prompt: 'Identify one or two key competitors and briefly analyze their digital strategy in comparison. Highlight areas where the target company is leading or lagging behind its competition.' },
-            { value: 'General IT SWOT Analysis', prompt: 'Perform a comprehensive SWOT (Strengths, Weaknesses, Opportunities, Threats) analysis of the company\'s overall IT and digital presence. The results should be categorized and placed into keyStrengthsIT and keyWeaknessesIT.' },
         ]
     },
 ];
@@ -72,7 +73,7 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading }) => {
 
   // Advanced Options State
   const [language, setLanguage] = useState('');
-  const [customResearchType, setCustomResearchType] = useState('General IT SWOT Analysis');
+  const [customResearchType, setCustomResearchType] = useState('General Business SWOT Analysis');
   const [customResearchText, setCustomResearchText] = useState('');
   const [senderName, setSenderName] = useState('');
   const [senderTitle, setSenderTitle] = useState('');
@@ -113,7 +114,8 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading }) => {
         if (selectedOption) {
             customResearch = selectedOption.prompt;
         } else {
-            customResearch = 'Identify key IT weaknesses or opportunities for improvement.';
+            // Default fallback if a selection somehow fails
+            customResearch = 'Perform a comprehensive SWOT (Strengths, Weaknesses, Opportunities, Threats) analysis of the company\'s overall business.';
         }
     }
 
@@ -191,7 +193,7 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading }) => {
           ))}
           <option value="Other">Other</option>
         </select>
-        <p className={formDescriptionStyle}>Ask the AI to do a deep dive on a specific topic. This will affect the IT Strengths/Weaknesses results.</p>
+        <p className={formDescriptionStyle}>Ask the AI to do a deep dive on a specific topic. This will affect the research findings.</p>
       </div>
 
       {customResearchType === 'Other' && (

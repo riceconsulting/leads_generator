@@ -99,6 +99,64 @@ const generateContentWithRetry = async (
 };
 
 /**
+ * A robust wrapper that combines content generation and JSON parsing with a retry mechanism for both.
+ */
+const generateAndParseWithRetry = async (
+    request: any, // Using any as GenerateContentParameters is not exported
+    onProgressUpdate: ((update: { status: string; progress: number }) => void) | null = null,
+    retries = 3
+): Promise<any> => {
+    let lastError: Error | null = null;
+    for (let i = 0; i < retries; i++) {
+        try {
+            // This inner call handles transient server errors
+            const response = await generateContentWithRetry(request, 2); 
+            const parsed = parseJsonResponse(response.text);
+
+            // A simple validation to trigger a retry if the AI returns an empty object
+            if (parsed && Object.keys(parsed).length === 0) {
+                 throw new Error("AI returned a valid but empty JSON object.");
+            }
+            
+            // Check for company list format specifically
+            if (request.contents && typeof request.contents === 'string' && request.contents.includes('"companyNames"')) {
+                if (!parsed.companyNames || !Array.isArray(parsed.companyNames)) {
+                    throw new Error("Parsed JSON for company list is invalid. Missing 'companyNames' array.");
+                }
+            }
+
+            return parsed; // Success!
+        } catch (e: any) {
+            lastError = e;
+            console.warn(`Attempt ${i + 1}/${retries} failed. Reason: ${e.message}`);
+            
+            if (i < retries - 1) {
+                if (onProgressUpdate) {
+                    onProgressUpdate({
+                        status: `AI response was unclear, retrying... (Attempt ${i + 2}/${retries}). This may take longer.`,
+                        progress: 5 // Keep progress low as we're stuck on an early step
+                    });
+                }
+                const delay = 1000 * Math.pow(2, i); // Exponential backoff: 1s, 2s, 4s...
+                console.log(`Retrying in ${delay / 1000}s...`);
+                await new Promise(res => setTimeout(res, delay));
+            }
+        }
+    }
+
+    console.error("All retry attempts failed.", lastError);
+    if (lastError instanceof AIServiceError) {
+        throw lastError;
+    }
+    // Throw a more specific error for format issues
+    if (lastError && (lastError.message.includes("invalid format") || lastError.message.includes("empty JSON"))) {
+        throw new Error("The AI is having trouble formatting its response. This can be a temporary issue. Please try again.");
+    }
+    throw lastError || new Error("An unknown error occurred after multiple retries.");
+};
+
+
+/**
  * PROMPT 1: Generates a prompt to find a list of company names.
  */
 const createCompanyListPrompt = (params: LeadGenerationParams): string => {
@@ -141,12 +199,12 @@ const createLeadDetailPrompt = (params: LeadGenerationParams, companyName: strin
     
     // This section creates placeholders if user input is blank.
     // The prompt explicitly tells the AI to use these placeholders verbatim if it sees them.
-    const finalSenderName = senderName || '[Your Name]';
-    const finalSenderTitle = senderTitle || '[Your Title]';
-    const finalItCompanyName = itCompanyName || '[Your Company Name]';
-    const finalItCompanyWebsite = itCompanyWebsite || '[yourwebsite.com]';
-    const finalItCompanyPhone = itCompanyPhone || '[Your Phone Number]';
-    const finalItCompanyEmail = itCompanyEmail || '[your.email@example.com]';
+    const finalSenderName = senderName || '';
+    const finalSenderTitle = senderTitle || '';
+    const finalItCompanyName = itCompanyName || '';
+    const finalItCompanyWebsite = itCompanyWebsite || '';
+    const finalItCompanyPhone = itCompanyPhone || '';
+    const finalItCompanyEmail = itCompanyEmail || '';
 
     const customResearchInstruction = customResearch
         ? `
@@ -223,7 +281,7 @@ You must use your best judgment to apply these labels. If the user specified a t
         4.  ${customResearchInstruction}
 
         **Phase 4: Personalized Outreach Generation in ${language}**
-        1.  **SENDER SIGNATURE RULE**: The email signature MUST be constructed using the details below. If a detail is a placeholder (e.g., '[Your Name]'), you MUST use that exact placeholder in the output. **DO NOT replace placeholders with fictional information.**
+        1.  **SENDER SIGNATURE RULE**: The email signature MUST be constructed using the details below. If a detail is blank or an empty string, you MUST omit that line from the signature. **DO NOT replace blank details with placeholders or fictional information.**
             *   Sender Name: ${finalSenderName}
             *   Sender Title: ${finalSenderTitle}
             *   Company: ${finalItCompanyName}
@@ -238,7 +296,7 @@ You must use your best judgment to apply these labels. If the user specified a t
         2.  **CRITICAL DATA HYGIENE**:
             *   **DO NOT** include citation markers (e.g., [1], [2]).
             *   Ensure all URLs are complete, valid, and are not tracking links.
-            *   If, after extensive searching, a piece of information cannot be found, the value for that field MUST be "Not Found".
+            *   If, after extensive searching, a piece of information cannot be found, the value for that field MUST be "Not Found" or an empty array [] for lists.
             *   **DO NOT INVENT or GUESS information**, especially contact details like emails and phone numbers.
 
         **Example JSON Structure with Guidelines:**
@@ -342,15 +400,13 @@ const validateLead = async (lead: BusinessLead): Promise<BusinessLead> => {
 
     try {
         const validationPrompt = createValidationPrompt(lead);
-        const validationResponse = await generateContentWithRetry({
+        const validationData = await generateAndParseWithRetry({
             model: 'gemini-2.5-flash',
             contents: validationPrompt,
             config: {
                 tools: [{ googleSearch: {} }]
             },
-        });
-
-        const validationData = parseJsonResponse(validationResponse.text);
+        }, null, 2); // 2 retries, no progress update
 
         if (typeof validationData.isCorrect === 'boolean' && !validationData.isCorrect && validationData.correctedWebsite && validationData.correctedWebsite.toLowerCase() !== 'not found') {
             console.log(`Website validation: Correcting URL for "${lead.businessName}" from ${lead.officialWebsite} to ${validationData.correctedWebsite}`);
@@ -375,24 +431,24 @@ export const generateLeads = async (
     // 1. Find a list of company names
     onProgressUpdate({ status: 'Scanning for businesses that match your criteria...', progress: 5 });
     const companyListPrompt = createCompanyListPrompt(params);
-    let companyResponse;
+    let companyData;
     try {
-        companyResponse = await generateContentWithRetry({
-            model: 'gemini-2.5-flash',
-            contents: companyListPrompt,
-            config: {
-                tools: [{ googleSearch: {} }]
+        companyData = await generateAndParseWithRetry(
+            {
+                model: 'gemini-2.5-flash',
+                contents: companyListPrompt,
+                config: { tools: [{ googleSearch: {} }] },
             },
-        });
+            onProgressUpdate // Pass callback for retry feedback
+        );
     } catch(e) {
-        console.error("Error finding companies:", e);
+        console.error("Error finding companies after multiple retries:", e);
         if (e instanceof AIServiceError) {
-            throw e; // Re-throw our custom error as it has a user-friendly message
+            throw e; // Re-throw our custom error with a user-friendly message
         }
-        throw new Error("Failed to find businesses. The AI may be experiencing high demand. Please try again later.");
+        throw new Error("Failed to find businesses after multiple attempts. The AI may be experiencing high demand. Please try again later.");
     }
     
-    const companyData = parseJsonResponse(companyResponse.text);
     const companyNames: string[] = companyData.companyNames || [];
 
     if (companyNames.length === 0) {
@@ -404,62 +460,45 @@ export const generateLeads = async (
       progress: 10,
     });
     
-    let simulationCancelled = false;
-    const simulationTimeouts: ReturnType<typeof setTimeout>[] = [];
-    
-    const simulateProgress = async () => {
-        for (let i = 0; i < companyNames.length; i++) {
-            await new Promise(resolve => {
-                const timeout = setTimeout(() => {
-                    if (simulationCancelled) {
-                        resolve(null);
-                        return;
-                    }
-                    const companyName = companyNames[i];
-                    // Research phase takes us from 10% to 85%
-                    const researchProgress = ((i + 1) / companyNames.length) * 75;
-                    const currentProgress = 10 + researchProgress;
-                    onProgressUpdate({
-                        status: `Researching "${companyName}" (${i + 1}/${companyNames.length})...`,
-                        progress: currentProgress,
-                    });
-                    resolve(null);
-                }, 2000 * i); // Stagger the UI updates
-                simulationTimeouts.push(timeout);
-            });
-        }
-    };
-    
-    simulateProgress();
-
-    // 2. Research each company in parallel
-    const researchPromises = companyNames.map((companyName) => {
-        const leadDetailPrompt = createLeadDetailPrompt(params, companyName);
-        return generateContentWithRetry({
-            model: 'gemini-2.5-flash',
-            contents: leadDetailPrompt,
-            config: {
-                tools: [{ googleSearch: {} }]
-            },
-        })
-        .then(leadResponse => {
-            const leadData = parseJsonResponse(leadResponse.text);
-            if (leadData.leads && leadData.leads.length > 0) {
-                return leadData.leads[0] as BusinessLead;
-            }
-            return null;
-        })
-        .catch(e => {
-            console.error(`Error researching "${companyName}":`, e);
-            return null;
+    // 2. Research each company sequentially to avoid rate limits and provide clear progress
+    const initialResults: (BusinessLead | null)[] = [];
+    for (let i = 0; i < companyNames.length; i++) {
+        const companyName = companyNames[i];
+        
+        const researchProgressStart = 10;
+        const researchProgressTotal = 80; // Research phase is from 10% to 90%
+        const progressPerLead = researchProgressTotal / companyNames.length;
+        const currentProgress = researchProgressStart + (i * progressPerLead);
+        
+        onProgressUpdate({
+            status: `Researching "${companyName}" (${i + 1}/${companyNames.length})...`,
+            progress: currentProgress,
         });
-    });
 
-    const initialResults = await Promise.all(researchPromises);
-
-    simulationCancelled = true;
-    simulationTimeouts.forEach(clearTimeout);
-
+        try {
+            const leadDetailPrompt = createLeadDetailPrompt(params, companyName);
+            const leadData = await generateAndParseWithRetry({
+                model: 'gemini-2.5-flash',
+                contents: leadDetailPrompt,
+                config: { tools: [{ googleSearch: {} }] },
+            }, null, 2); // Use fewer retries here to fail faster on a single bad lead
+            
+            if (leadData.leads && leadData.leads.length > 0) {
+                initialResults.push(leadData.leads[0] as BusinessLead);
+            } else {
+                initialResults.push(null); // AI returned empty leads array
+            }
+        } catch (e) {
+            console.error(`Error researching "${companyName}" after retries:`, e);
+            initialResults.push(null); // Mark as failed
+        }
+        
+        // Add a small delay between requests to be polite to the API
+        if (i < companyNames.length - 1) {
+            await new Promise(res => setTimeout(res, 500));
+        }
+    }
+    
     const successfulLeads = initialResults.filter((lead): lead is BusinessLead => lead !== null);
     
     if (companyNames.length > 0 && successfulLeads.length === 0) {
