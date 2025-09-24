@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenModal, savedLeadsCount, theme, to
             href="https://riceai.net" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="flex items-center group"
+            className="flex items-center group transition-opacity duration-200 hover:opacity-80"
           >
             <img 
               src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop,q=95/AGB2yyJJKXfD527r/rice-ai-consulting-2-AoPWxvnWOju2GwOz.png" 

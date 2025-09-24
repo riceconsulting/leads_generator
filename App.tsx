@@ -235,8 +235,8 @@ const App: React.FC = () => {
         toggleTheme={toggleTheme}
       />
       
-      <main className="flex-grow container mx-auto p-4 md:p-8 pb-24">
-        <div className="max-w-4xl mx-auto">
+      <main className="flex-grow container mx-auto p-4 sm:p-6 md:p-8 pb-24">
+        <div className="max-w-5xl mx-auto">
           <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-lg mb-8">
             <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark mb-2">Lead Generator</h2>
             <p className="text-text-secondary-light dark:text-text-secondary-dark mb-6">

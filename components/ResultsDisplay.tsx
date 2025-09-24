@@ -67,7 +67,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   return (
     <div className="space-y-6 mb-24">
-      <div id="results-display-container" className="flex justify-between items-center">
+      <div id="results-display-container" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h3 className="text-xl font-bold text-text-primary-light dark:text-text-primary-dark">Generated Leads</h3>
         {/* Hide Save All button during tutorial */}
         {!isTutorialActive && leads.length > 0 && (

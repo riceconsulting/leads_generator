@@ -256,9 +256,9 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
 
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4" onClick={onClose}>
         <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-          <div className="flex justify-between items-center p-4 md:p-6 border-b border-border-light dark:border-border-dark">
+          <div className="flex flex-wrap justify-between items-center p-4 md:p-6 border-b border-border-light dark:border-border-dark gap-4">
             <h2 className="text-xl md:text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">Saved Leads ({leads.length})</h2>
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="flex flex-wrap items-center justify-end gap-2 md:gap-3">
               <button onClick={handleTextImportClick} disabled={isImporting} className={secondaryButtonStyles}>
                   <FileTextIcon className="h-4 w-4 mr-2" /> Import Text
               </button>
@@ -278,8 +278,8 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
             </div>
           </div>
           
-          <main className="flex-grow p-4 overflow-y-auto">
-            <div className="overflow-y-auto">
+          <main className="flex-grow p-2 sm:p-4 overflow-y-auto">
+            <div className="overflow-x-auto">
               {leads.length === 0 ? (
                 <div className="text-center py-20 px-6">
                   <InfoIcon className="mx-auto h-16 w-16 text-text-secondary-dark" />
@@ -288,8 +288,8 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                 </div>
               ) : (
                 <div className="p-1">
-                  <table className="min-w-full divide-y divide-border-light dark:divide-border-dark">
-                    <thead className="bg-background-light dark:bg-border-dark">
+                  <table className="min-w-full">
+                    <thead className="hidden md:table-header-group bg-background-light dark:bg-border-dark">
                       <tr>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Business</th>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Contact Person</th>
@@ -297,26 +297,32 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Website</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-surface-light dark:bg-surface-dark divide-y divide-border-light dark:divide-border-dark">
+                    <tbody className="bg-surface-light dark:bg-surface-dark">
                       {leads.map((lead) => {
-                        // Ensure contactEmail and contactPhone are always arrays to prevent .join() errors
                         const emails = Array.isArray(lead.contactEmail) ? lead.contactEmail : (lead.contactEmail ? [String(lead.contactEmail)] : []);
                         const phones = Array.isArray(lead.contactPhone) ? lead.contactPhone : (lead.contactPhone ? [String(lead.contactPhone)] : []);
                         
                         return (
-                          <tr key={lead.id} className="hover:bg-background-light dark:hover:bg-border-dark/50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-primary-light/20 dark:bg-primary-dark/20 rounded-full">
-                                    <BuildingIcon className="h-5 w-5 text-primary-light dark:text-primary-dark" />
-                                </div>
-                                <div className="ml-4">
-                                  <div className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">{lead.businessName}</div>
-                                  <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{lead.companySizeCategory}</div>
-                                </div>
-                              </div>
+                          <tr key={lead.id} className="block mb-4 p-4 rounded-lg shadow-md md:table-row md:shadow-none md:mb-0 border md:border-b md:border-t-0 md:border-x-0 border-border-light dark:border-border-dark">
+                            
+                            <td className="flex justify-between items-center py-2 md:table-cell md:px-6 md:py-4 md:w-2/5">
+                               <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">Business</span>
+                               <div className="text-right md:text-left">
+                                  <div className="flex items-center">
+                                    <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-primary-light/20 dark:bg-primary-dark/20 rounded-full">
+                                        <BuildingIcon className="h-5 w-5 text-primary-light dark:text-primary-dark" />
+                                    </div>
+                                    <div className="ml-4">
+                                      <div className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">{lead.businessName}</div>
+                                      <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{lead.companySizeCategory}</div>
+                                    </div>
+                                  </div>
+                               </div>
                             </td>
-                             <td className="px-6 py-4 whitespace-nowrap">
+
+                             <td className="flex justify-between items-center py-2 border-t border-border-light dark:border-border-dark md:table-cell md:px-6 md:py-4 md:border-t-0">
+                               <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">Contact Person</span>
+                               <div className="text-right md:text-left">
                                 {lead.contactPerson && lead.contactPerson.name !== 'Not Found' ? (
                                     <div className="flex items-center">
                                         <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-border-light dark:bg-border-dark rounded-full">
@@ -330,19 +336,28 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                                 ) : (
                                     <span className="text-sm text-text-secondary-light dark:text-text-secondary-dark">Not Found</span>
                                 )}
+                                </div>
                              </td>
-                            <td className="px-6 py-4 whitespace-normal break-words">
-                              <div className="flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark mb-1">
-                                <MailIcon className="h-4 w-4 mr-2 flex-shrink-0" /> {emails.join(', ') || 'N/A'}
-                              </div>
-                              <div className="flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                                <PhoneIcon className="h-4 w-4 mr-2 flex-shrink-0" /> {phones.join(', ') || 'N/A'}
+
+                            <td className="flex justify-between items-center py-2 border-t border-border-light dark:border-border-dark md:table-cell md:px-6 md:py-4 md:border-t-0">
+                              <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">General Contact</span>
+                              <div className="text-right md:text-left text-sm text-text-secondary-light dark:text-text-secondary-dark break-words">
+                                <div className="flex items-center justify-end md:justify-start mb-1">
+                                  <MailIcon className="h-4 w-4 mr-2 flex-shrink-0" /> {emails.join(', ') || 'N/A'}
+                                </div>
+                                <div className="flex items-center justify-end md:justify-start">
+                                  <PhoneIcon className="h-4 w-4 mr-2 flex-shrink-0" /> {phones.join(', ') || 'N/A'}
+                                </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm">
-                              <a href={lead.officialWebsite} target="_blank" rel="noopener noreferrer" className="text-primary-dark hover:underline dark:text-primary-light">
-                                {lead.officialWebsite}
-                              </a>
+
+                            <td className="flex justify-between items-center py-2 border-t border-border-light dark:border-border-dark md:table-cell md:px-6 md:py-4 md:border-t-0">
+                               <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">Website</span>
+                               <div className="text-right md:text-left text-sm">
+                                  <a href={lead.officialWebsite} target="_blank" rel="noopener noreferrer" className="text-primary-dark hover:underline dark:text-primary-light break-all">
+                                    {lead.officialWebsite}
+                                  </a>
+                               </div>
                             </td>
                           </tr>
                         );

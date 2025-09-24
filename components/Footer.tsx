@@ -4,8 +4,8 @@ const Footer: React.FC = () => {
   return (
     <footer className="fixed bottom-0 left-0 w-full bg-surface-light/90 dark:bg-surface-dark/90 backdrop-blur-sm shadow-lg z-50 border-t border-border-light dark:border-border-dark">
       <div className="container mx-auto px-4 md:px-8 py-3">
-        <div className="flex justify-center items-center">
-          <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mr-4">
+        <div className="flex flex-col sm:flex-row justify-center items-center text-center sm:text-left">
+          <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-2 sm:mb-0 sm:mr-4">
             Need a custom solution or more leads?
           </p>
           <a
