@@ -177,7 +177,7 @@ const Tutorial: React.FC<TutorialProps> = ({ onFinish, onStartDummyLeadGeneratio
     <div className="fixed inset-0 z-[1000] bg-black bg-opacity-70">
       <div style={tooltipStyle} className="bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl p-4 animate-fade-in relative">
         <div style={arrowStyle} />
-        <h3 className="font-bold text-lg mb-2 text-text-primary-light dark:text-text-primary-dark">{tutorialSteps[step].title}</h3>
+        <h3 className="font-heading font-bold text-lg mb-2 text-text-primary-light dark:text-text-primary-dark">{tutorialSteps[step].title}</h3>
         <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{tutorialSteps[step].content}</p>
         <div className="flex justify-between items-center mt-4">
           <span className="text-xs text-text-secondary-dark">{step + 1} / {tutorialSteps.length}</span>

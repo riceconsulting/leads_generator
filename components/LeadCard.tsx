@@ -16,7 +16,7 @@ const InfoItem: React.FC<{ icon: React.ReactNode; label: string; value: React.Re
         <div className="ml-3">
             <dt className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">{label}</dt>
             <dd className="mt-1 text-sm text-text-primary-light dark:text-text-primary-dark break-words">
-                {isLink ? <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary-dark hover:underline dark:text-primary-light">{value}</a> : value}
+                {isLink ? <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent-light dark:text-accent-dark hover:underline">{value}</a> : value}
             </dd>
         </div>
     </div>
@@ -41,7 +41,7 @@ const CollapsibleList: React.FC<{ items: string[] }> = ({ items }) => {
           </div>
           <button 
             onClick={() => setIsListExpanded(false)} 
-            className="text-xs text-primary-dark dark:text-primary-light hover:underline mt-1 focus:outline-none font-medium"
+            className="text-xs text-accent-light dark:text-accent-dark hover:underline mt-1 focus:outline-none font-medium"
             aria-label="Show less contact information"
           >
             Show less
@@ -55,7 +55,7 @@ const CollapsibleList: React.FC<{ items: string[] }> = ({ items }) => {
         <span>{items[0]}</span>
         <button 
           onClick={() => setIsListExpanded(true)} 
-          className="ml-2 text-xs text-primary-dark dark:text-primary-light hover:underline whitespace-nowrap focus:outline-none font-medium"
+          className="ml-2 text-xs text-accent-light dark:text-accent-dark hover:underline whitespace-nowrap focus:outline-none font-medium"
           aria-label={`Show ${items.length - 1} more contact entries`}
         >
           (...and {items.length - 1} more)
@@ -90,7 +90,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
 
     return (
         <div className="mt-6 border-t border-border-light dark:border-border-dark pt-4">
-            <h4 className="text-base font-semibold text-text-primary-light dark:text-text-primary-dark mb-3 flex items-center">
+            <h4 className="text-base font-heading font-semibold text-text-primary-light dark:text-text-primary-dark mb-3 flex items-center">
                 <FileTextIcon className="h-5 w-5 mr-2 text-primary-light dark:text-primary-dark" />
                 {focusTitle}
             </h4>
@@ -102,7 +102,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {hasStrengths && (
                     <div>
-                        <h5 className="font-semibold text-text-primary-light dark:text-text-primary-dark mb-2 flex items-center">
+                        <h5 className="font-heading font-semibold text-text-primary-light dark:text-text-primary-dark mb-2 flex items-center">
                             <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
                             Positive Findings
                         </h5>
@@ -113,7 +113,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
                 )}
                 {hasWeaknesses && (
                        <div>
-                        <h5 className="font-semibold text-text-primary-light dark:text-text-primary-dark mb-2 flex items-center">
+                        <h5 className="font-heading font-semibold text-text-primary-light dark:text-text-primary-dark mb-2 flex items-center">
                             <XCircleIcon className="h-5 w-5 text-yellow-500 mr-2" />
                             Opportunities for Improvement
                         </h5>
@@ -138,7 +138,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
                     </span>
                 </div>
                 <div>
-                    <h3 className="text-xl font-bold text-text-primary-light dark:text-text-primary-dark">{lead.businessName}</h3>
+                    <h3 className="text-xl font-heading font-bold text-text-primary-light dark:text-text-primary-dark">{lead.businessName}</h3>
                     <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{lead.companySizeCategory} ({lead.inferredPrimaryLanguage})</p>
                 </div>
             </div>
@@ -186,7 +186,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
           {/* Email Draft */}
           <div>
             <div className="flex justify-between items-center mb-2">
-                <h4 className="font-semibold text-text-primary-light dark:text-text-primary-dark flex items-center">
+                <h4 className="font-heading font-semibold text-text-primary-light dark:text-text-primary-dark flex items-center">
                     <MailIcon className="h-5 w-5 mr-2" />
                     Draft Email ({lead.draftEmail.tone})
                 </h4>
@@ -202,7 +202,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
           {/* WhatsApp Draft */}
           <div>
             <div className="flex justify-between items-center mb-2">
-                <h4 className="font-semibold text-text-primary-light dark:text-text-primary-dark flex items-center">
+                <h4 className="font-heading font-semibold text-text-primary-light dark:text-text-primary-dark flex items-center">
                     <MessageSquareIcon className="h-5 w-5 mr-2" />
                     Draft WhatsApp ({lead.draftWhatsApp.tone})
                 </h4>
@@ -217,7 +217,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
       
       {/* Toggle Button in the footer of the card */}
       <div className="border-t border-border-light dark:border-border-dark bg-surface-light/80 dark:bg-surface-dark/80 px-6 py-2">
-            <button onClick={() => setIsExpanded(!isExpanded)} className="w-full flex justify-center items-center text-sm font-semibold text-primary-dark dark:text-primary-light hover:underline focus:outline-none focus:ring-2 focus:ring-primary-light rounded">
+            <button onClick={() => setIsExpanded(!isExpanded)} className="w-full flex justify-center items-center text-sm font-semibold text-accent-light dark:text-accent-dark hover:underline focus:outline-none focus:ring-2 focus:ring-primary-light rounded">
                 <span>{isExpanded ? 'Show Less' : 'View Full Details & Drafts'}</span>
                 <ChevronDownIcon className={`h-5 w-5 ml-2 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
             </button>

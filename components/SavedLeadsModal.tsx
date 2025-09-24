@@ -257,7 +257,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4" onClick={onClose}>
         <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
           <div className="flex flex-wrap justify-between items-center p-4 md:p-6 border-b border-border-light dark:border-border-dark gap-4">
-            <h2 className="text-xl md:text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">Saved Leads ({leads.length})</h2>
+            <h2 className="text-xl md:text-2xl font-heading font-bold text-text-primary-light dark:text-text-primary-dark">Saved Leads ({leads.length})</h2>
             <div className="flex flex-wrap items-center justify-end gap-2 md:gap-3">
               <button onClick={handleTextImportClick} disabled={isImporting} className={secondaryButtonStyles}>
                   <FileTextIcon className="h-4 w-4 mr-2" /> Import Text
@@ -313,7 +313,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                                         <BuildingIcon className="h-5 w-5 text-primary-light dark:text-primary-dark" />
                                     </div>
                                     <div className="ml-4">
-                                      <div className="text-sm font-medium text-text-primary-light dark:text-text-primary-dark">{lead.businessName}</div>
+                                      <div className="text-sm font-heading font-semibold text-text-primary-light dark:text-text-primary-dark">{lead.businessName}</div>
                                       <div className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{lead.companySizeCategory}</div>
                                     </div>
                                   </div>
@@ -354,7 +354,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                             <td className="flex justify-between items-center py-2 border-t border-border-light dark:border-border-dark md:table-cell md:px-6 md:py-4 md:border-t-0">
                                <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">Website</span>
                                <div className="text-right md:text-left text-sm">
-                                  <a href={lead.officialWebsite} target="_blank" rel="noopener noreferrer" className="text-primary-dark hover:underline dark:text-primary-light break-all">
+                                  <a href={lead.officialWebsite} target="_blank" rel="noopener noreferrer" className="text-accent-light dark:text-accent-dark hover:underline break-all">
                                     {lead.officialWebsite}
                                   </a>
                                </div>

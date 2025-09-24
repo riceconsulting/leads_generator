@@ -13,7 +13,7 @@ const LoadingDisplay: React.FC<LoadingDisplayProps> = ({ status, progress }) => 
     <div id="loading-display-container" className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-lg flex flex-col items-center justify-center text-center mb-24">
       {/* Swapped bounce for pulse animation, which is more subtle and less distracting */}
       <BotIcon className="h-12 w-12 text-primary-light dark:text-primary-dark animate-pulse" />
-      <h3 className="mt-4 text-lg font-medium text-text-primary-light dark:text-text-primary-dark">
+      <h3 className="mt-4 text-lg font-heading font-semibold text-text-primary-light dark:text-text-primary-dark">
         AI is at work...
       </h3>
       {/* 

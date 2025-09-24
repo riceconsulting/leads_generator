@@ -145,7 +145,7 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading }) => {
     setDailyCookie('generationCount', newCount.toString());
   };
 
-  const formInputStyle = "w-full px-3 py-2 bg-background-light dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:outline-none focus:ring-primary-light focus:border-primary-light dark:focus:ring-primary-dark dark:focus:border-primary-dark";
+  const formInputStyle = "w-full px-3 py-2 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:outline-none focus:ring-primary-light focus:border-primary-light dark:focus:ring-primary-dark dark:focus:border-primary-dark";
   const formLabelStyle = "block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1";
   const formDescriptionStyle = "mt-1 text-xs text-text-secondary-light dark:text-text-secondary-dark";
   const generationsLeft = RATE_LIMIT - generationCount;

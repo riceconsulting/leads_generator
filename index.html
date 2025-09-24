@@ -5,20 +5,27 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RICE AI Content Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         darkMode: 'class',
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              heading: ['Poppins', 'sans-serif'],
+            },
             colors: {
-              'primary-light': '#9BBCC2',
-              'background-light': '#f1f5f9', // slate-100
+              'primary-light': '#9BBBCC',
+              'background-light': '#f8fafc', // slate-50
               'surface-light': '#ffffff',
-              'text-primary-light': '#1e293b', // slate-800
-              'text-secondary-light': '#64748b', // slate-500
+              'text-primary-light': '#0f172a', // slate-900
+              'text-secondary-light': '#475569', // slate-600
               'border-light': '#e2e8f0', // slate-200
-              'hashtag-light': '#0ea5e9', // sky-500
+              'accent-light': '#5890AD',
               
               'primary-dark': '#5890AD',
               'background-dark': '#0f172a', // slate-900
@@ -26,7 +33,7 @@
               'text-primary-dark': '#f1f5f9', // slate-100
               'text-secondary-dark': '#94a3b8', // slate-400
               'border-dark': '#334155', // slate-700
-              'hashtag-dark': '#38bdf8', // sky-400
+              'accent-dark': '#9BBBCC',
             },
             keyframes: {
               fadeIn: {
@@ -58,10 +65,10 @@
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #f1f5f9; /* slate-100 */
+        background: #f8fafc; /* background-light */
       }
       .dark ::-webkit-scrollbar-track {
-        background: #0f172a; /* slate-900 */
+        background: #0f172a; /* background-dark */
       }
       ::-webkit-scrollbar-thumb {
         background: #cbd5e1; /* slate-300 */
