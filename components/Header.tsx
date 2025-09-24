@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenModal, savedLeadsCount, theme, to
             />
           </a>
           <h1 className="ml-4 text-xl sm:text-2xl font-bold tracking-tight text-text-primary-light dark:text-text-primary-dark">
-            Rice AI - Lead Generator
+            RICE AI - Lead Generator
           </h1>
         </div>
         <div className="flex items-center gap-4">
