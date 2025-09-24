@@ -101,7 +101,21 @@ const App: React.FC = () => {
 
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+      let friendlyMessage = 'An unexpected error occurred. Please try again in a moment.';
+      if (err instanceof Error) {
+        // AIServiceError is a custom error from our service with a user-friendly message.
+        if (err.name === 'AIServiceError') {
+            friendlyMessage = err.message;
+        } else if (err.message.includes("No businesses found")) {
+            friendlyMessage = "Couldn't find businesses matching your criteria. Please try broadening your search.";
+        } else if (err.message.includes("invalid format")) {
+            friendlyMessage = "The AI returned an unexpected response format. This can be a temporary issue. Please try again.";
+        } else {
+            // A general catch-all for other errors.
+            friendlyMessage = "An error occurred during generation. Please adjust your search and try again.";
+        }
+      }
+      setError(friendlyMessage);
     } finally {
       setIsLoading(false);
       setGenerationStatus('');

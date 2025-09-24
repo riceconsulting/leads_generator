@@ -105,26 +105,26 @@ const createCompanyListPrompt = (params: LeadGenerationParams): string => {
     const { location, keywords, count, excludedBusinesses = [], companyGrowthStage } = params;
     
     const exclusionInstruction = excludedBusinesses.length > 0
-        ? `\n- CRITICAL: Exclude these businesses: ${excludedBusinesses.join(', ')}`
+        ? `\n- CRITICAL EXCLUSION: You MUST NOT include any of the following businesses in your results: ${excludedBusinesses.join(', ')}.`
         : '';
         
     const sizeFilteringInstruction = (companyGrowthStage && companyGrowthStage !== 'Any')
-        ? `\n- Target Company Growth Stage: "${companyGrowthStage}"`
+        ? `\n- TARGET GROWTH STAGE: Focus exclusively on companies that fit the "${companyGrowthStage}" growth stage.`
         : '';
 
     return `
-        You are a business research assistant. Your task is to find a list of exactly ${count} company names that match the following criteria.
-        - Location: "${location}"
-        - Industry Keywords: "${keywords || 'any'}"
+        You are an Expert Business Intelligence Analyst. Your task is to use Google Search to generate a list of exactly ${count} legitimate, operational company names that precisely match the following criteria. Your results must be of the highest quality.
+        - LOCATION: "${location}"
+        - INDUSTRY KEYWORDS: "${keywords || 'any'}"
         ${sizeFilteringInstruction}
         ${exclusionInstruction}
+        - WEBSITE REQUIREMENT: Only include companies that have an official, operational business website. You MUST AVOID directories (e.g., Yellow Pages), social media pages (e.g., Facebook), B2B portals, and marketplaces.
 
-        Use the Google Search tool to find them.
-        Your entire response MUST be a single JSON object with one key, "companyNames", which is an array of strings. Do not include any other text.
+        Your entire response MUST be a single, clean JSON object with one key, "companyNames", which is an array of strings. Do not include any explanatory text, markdown, or anything else outside the JSON structure.
         
-        Example:
+        Example Output Format:
         {
-            "companyNames": ["PT Example Corp", "Another Business Ltd", "Surabaya Tech Solutions"]
+            "companyNames": ["Official Company Name One Inc.", "Another Business Solutions Ltd.", "Surabaya Tech Corp"]
         }
     `;
 };
@@ -139,9 +139,8 @@ const createLeadDetailPrompt = (params: LeadGenerationParams, companyName: strin
         emailTemplate, whatsappTemplate
     } = params;
     
-    // If sender/company details are not provided, use placeholders.
-    // This ensures the generated messages have a complete-looking signature or template,
-    // which the user can then easily identify and fill in.
+    // This section creates placeholders if user input is blank.
+    // The prompt explicitly tells the AI to use these placeholders verbatim if it sees them.
     const finalSenderName = senderName || '[Your Name]';
     const finalSenderTitle = senderTitle || '[Your Title]';
     const finalItCompanyName = itCompanyName || '[Your Company Name]';
@@ -149,7 +148,6 @@ const createLeadDetailPrompt = (params: LeadGenerationParams, companyName: strin
     const finalItCompanyPhone = itCompanyPhone || '[Your Phone Number]';
     const finalItCompanyEmail = itCompanyEmail || '[your.email@example.com]';
 
-    // --- All of your original, detailed instructions are now fully integrated here ---
     const customResearchInstruction = customResearch
         ? `
 **CUSTOM DEEP DIVE RESEARCH**:
@@ -172,15 +170,15 @@ You must use your best judgment to apply these labels. If the user specified a t
 * **Email Generation (User Template)**:
     * You MUST use the user-provided template below.
     * Replace placeholders like {{businessName}}, {{contactPerson.name}}, and {{keyWeaknessesIT[0]}} (use the first weakness). If a placeholder value isn't found, use a generic alternative (e.g., "your company" for {{businessName}}).
-    * The email body must end with the full sender signature.
+    * The email body must end with the full sender signature, constructed according to the SENDER SIGNATURE RULE.
     * **Template**: "${emailTemplate}"
 `
         : `
 * **Email Generation (Default)**:
-    * Address the email to the \\\`contactPerson\\\` if found. Otherwise, use a general greeting.
+    * Address the email to the 'contactPerson' if found. Otherwise, use a general greeting.
     * **CRITICAL LOGIC**: First, check the 'keyWeaknessesIT' list. If you found one or more weaknesses, your email MUST reference the most significant weakness as a talking point to demonstrate your research.
     * **If AND ONLY IF the 'keyWeaknessesIT' list is empty**, then generate a more general but still personalized introduction. Mention the company by name, introduce our services briefly, and offer a 'free, no-obligation IT assessment' to explore potential areas for improvement.
-    * The email body must end with the full sender signature.
+    * The email body must end with the full sender signature, constructed according to the SENDER SIGNATURE RULE.
 `;
 
     const whatsappTemplateInstruction = whatsappTemplate
@@ -194,63 +192,76 @@ You must use your best judgment to apply these labels. If the user specified a t
         : `
 * **WhatsApp Message Generation (Default)**:
     * **CRITICAL**: The WhatsApp message MUST be very short, conversational, and friendly. Do NOT use a formal email structure or signature block.
-    * **Template**: \\\`[Greeting] [Contact Name], saya [Sender Name] dari [IT Company Name]. Saya lihat [mention a specific IT weakness found]. Tertarik untuk diskusi singkat tentang ini? Terima kasih.\\\`
-    * **Example (Bahasa)**: \\\`Halo Pak Budi, saya Harris dari RICE AI Consulting. Saya lihat website Toko ABC sepertinya bisa lebih cepat. Tertarik untuk ngobrol santai soal ini? Thanks.\\\`
-    * **Example (English)**: \\\`Hi John, this is Harris from RICE AI. Noticed your site could use a mobile performance boost. Open to a quick chat about it? Thanks.\\\`
+    * **Template**: \`[Greeting] [Contact Name], saya [Sender Name] dari [IT Company Name]. Saya lihat [mention a specific IT weakness found]. Tertarik untuk diskusi singkat tentang ini? Terima kasih.\`
+    * **Example (Bahasa)**: \`Halo Pak Budi, saya Harris dari RICE AI Consulting. Saya lihat website Toko ABC sepertinya bisa lebih cepat. Tertarik untuk ngobrol santai soal ini? Thanks.\`
+    * **Example (English)**: \`Hi John, this is Harris from RICE AI. Noticed your site could use a mobile performance boost. Open to a quick chat about it? Thanks.\`
     * The goal is to start a conversation. Keep it under 3 sentences.
 `;
-    // --- End of detailed instructions ---
 
     return `
-        You are a world-class AI assistant for an IT consulting company. Your goal is to perform a deep-dive investigation on a single company, "${companyName}", using Google Search, and generate a personalized outreach message.
+        You are a world-class AI Business Intelligence Analyst. Your mission is to conduct a meticulous, in-depth investigation of a single company, "${companyName}", using Google Search. Your primary objective is to uncover **accurate contact information for a key decision-maker** and to generate a comprehensive, high-quality business profile. Accuracy, verification, and lead quality are paramount.
 
-        Follow this multi-phase process FOR THE COMPANY: "${companyName}".
+        **Follow this multi-phase process FOR THE COMPANY: "${companyName}".**
 
-        **Phase 1: Deep Dive Research (Using Google Search Tool)**
-        1.  Use multiple, targeted queries ('${companyName} official website', '${companyName} contact', etc.) to find the following information. All text output must be in the target language: **${language}**.
-            * officialWebsite, contactEmail, contactPhone, contactWhatsApp, companyDescription, estimatedEmployeeCount, keyStrengthsIT, keyWeaknessesIT, inferredPrimaryLanguage.
-            * ${customResearchInstruction}
+        **Phase 1: Foundational Research & Website Identification**
+        1.  **Identify Official Website**: This is the most critical first step. Use search queries like \`"${companyName}" official website\`.
+        2.  **Verify Legitimacy**: The website must belong to an operational business. You MUST disregard directories (e.g., Yellow Pages), social media profiles, news articles, and B2B marketplaces as the official website. The official website is the primary source for the next steps. All text output must be in the target language: **${language}**.
 
-        **Phase 2: Key Contact Person Research**
-        1.  Find a key decision-maker (Owner, CEO, IT Manager) for "${companyName}".
-        2.  Extract their full 'name' and 'title'.
+        **Phase 2: Meticulous Contact Discovery Protocol**
+        1.  **Target Decision-Maker**: Your primary goal is to find a key decision-maker (e.g., Owner, CEO, CTO, IT Manager, Head of Technology, Marketing Director). Use advanced Google searches like \`site:linkedin.com/in "${companyName}" "CEO"\` to find profiles and identify the correct person and their exact 'title'. The 'name' MUST be a person's full name, not the company name.
+        2.  **Direct Email Triangulation**: Finding a direct, individual email is a critical success metric. Generic emails (info@, contact@) are a last resort.
+            *   Scour the official website's "Contact Us", "About Us", "Team", and "Leadership" pages.
+            *   If you find the decision-maker's name but no email, search relentlessly using queries like \`"Jane Doe" "${companyName}" email address\`.
+            *   Look for email patterns (e.g., \`firstname.lastname@company.com\`) on the site and apply it to the decision-maker's name.
+            *   Collect all valid, non-generic emails you find into the list.
+        3.  **Phone Number Verification**: Find the main business phone number. Verify it on the contact page. Note if a number is specifically designated for WhatsApp. Format the number clearly.
 
-        **Phase 3: Company Profiling & Size Assessment**
-        1.  ${companySizeInstruction}
+        **Phase 3: Comprehensive Company Profiling**
+        1.  From the website and search results, gather: \`companyDescription\`, \`estimatedEmployeeCount\`, \`keyStrengthsIT\`, \`keyWeaknessesIT\`.
+        2.  Infer the \`inferredPrimaryLanguage\` based on the website's content.
+        3.  ${companySizeInstruction}
+        4.  ${customResearchInstruction}
 
         **Phase 4: Personalized Outreach Generation in ${language}**
-        1.  Based on your research, generate a draft email and WhatsApp message.
-        2.  Sender Details: ${finalSenderName}, ${finalSenderTitle}, ${finalItCompanyName}, ${finalItCompanyWebsite}, ${finalItCompanyPhone}, ${finalItCompanyEmail}.
-        3.  ${emailTemplateInstruction}
-        4.  ${whatsappTemplateInstruction}
+        1.  **SENDER SIGNATURE RULE**: The email signature MUST be constructed using the details below. If a detail is a placeholder (e.g., '[Your Name]'), you MUST use that exact placeholder in the output. **DO NOT replace placeholders with fictional information.**
+            *   Sender Name: ${finalSenderName}
+            *   Sender Title: ${finalSenderTitle}
+            *   Company: ${finalItCompanyName}
+            *   Website: ${finalItCompanyWebsite}
+            *   Phone: ${finalItCompanyPhone}
+            *   Email: ${finalItCompanyEmail}
+        2.  ${emailTemplateInstruction}
+        3.  ${whatsappTemplateInstruction}
 
-        **Phase 5: Structured JSON Output**
-        Compile all information into a single JSON object. Your entire response MUST be only this JSON object. The root must be a "leads" key containing an array with a SINGLE business lead object.
+        **Phase 5: Structured JSON Output & Data Sanitization**
+        1.  Compile ALL information into a single JSON object. Your entire response MUST be only this JSON object.
+        2.  **CRITICAL DATA HYGIENE**:
+            *   **DO NOT** include citation markers (e.g., [1], [2]).
+            *   Ensure all URLs are complete, valid, and are not tracking links.
+            *   If, after extensive searching, a piece of information cannot be found, the value for that field MUST be "Not Found".
+            *   **DO NOT INVENT or GUESS information**, especially contact details like emails and phone numbers.
 
-        **Phase 6: Final Data Cleaning (MANDATORY)**
-        - CRITICAL: REMOVE ALL CITATION MARKERS (e.g., [1], [2]).
-
-        **Example JSON Structure:**
+        **Example JSON Structure with Guidelines:**
         \`\`\`json
         {
           "leads": [
             {
-              "businessName": "string",
-              "officialWebsite": "string (URL or 'Not Found')",
+              "businessName": "string // The official company name.",
+              "officialWebsite": "string // The full, correct URL. 'Not Found' if undiscoverable.",
               "contactPerson": {
-                "name": "string (e.g., 'Budi Santoso' or 'Not Found')",
-                "title": "string (e.g., 'Owner' or '')"
+                "name": "string // Full name of a decision-maker. 'Not Found' if none.",
+                "title": "string // Their job title."
               },
-              "contactEmail": ["string (email)", "string (another_email)"],
-              "contactPhone": ["string (phone number)"],
-              "contactWhatsApp": "string (e.g., '+628123456789' or 'Not Found')",
-              "companyDescription": "string",
+              "contactEmail": ["string // List of all found emails. Prioritize direct, individual emails."],
+              "contactPhone": ["string // List of all found phone numbers."],
+              "contactWhatsApp": "string // A number confirmed or likely to be WhatsApp.",
+              "companyDescription": "string // A concise description of the business.",
               "estimatedEmployeeCount": "string",
               "inferredPrimaryLanguage": "string",
-              "companySizeCategory": "string (This MUST be one of 'Small', 'Medium', 'Large', or 'Enterprise')",
+              "companySizeCategory": "string // MUST be one of 'Small', 'Medium', 'Large', or 'Enterprise'.",
               "keyStrengthsIT": ["string"],
               "keyWeaknessesIT": ["string"],
-              "customResearchResults": "string (Answer to the custom query, or 'Not Found')",
+              "customResearchResults": "string // Answer to the custom query, or 'Not Found'.",
               "draftEmail": {
                 "language": "string",
                 "tone": "string",
@@ -280,24 +291,29 @@ const createValidationPrompt = (lead: BusinessLead): string => {
     const phonesString = (Array.isArray(contactPhone) ? contactPhone : []).join(', ');
 
     return `
-        You are a meticulous data validation specialist. Your task is to verify if a given website URL is the correct, official website for a specific company, using its contact information as primary evidence.
+        You are a meticulous data validation AI. Your task is to rigorously verify if a given website URL is the correct, official website for a specific company.
 
         **Company to Verify:** "${businessName}"
         **Proposed Website:** "${officialWebsite}"
         **Known Contact Emails:** "${emailsString || 'None'}"
         **Known Contact Phones:** "${phonesString || 'None'}"
 
-        **Verification Process:**
-        1.  Use Google Search to investigate the company.
-        2.  **CRITICAL:** Cross-reference the domain from the contact emails with the proposed website's domain. A match is a very strong positive signal.
-        3.  Check if the contact phone numbers are listed on the proposed website.
-        4.  If the proposed website is incorrect (e.g., it's a directory, a social media page, or belongs to a different company), find the correct official website.
-        5.  Determine if the proposed website is correct.
-
+        **Verification Protocol:**
+        1.  **Initial Scan**: Access the proposed website and look for the company name in the title, footer, or "About Us" page. A direct match is a strong indicator.
+        2.  **Contact Info Cross-Reference**:
+            *   **Email Domain Match**: This is a CRITICAL check. Does the domain of any known contact emails (@domain.com) match the domain of the proposed website? This is the strongest evidence.
+            *   **Phone Number Match**: Are any of the known contact phone numbers listed on the website?
+        3.  **Search Engine Triangulation**: Use Google Search with queries like \`"${businessName}" official site\`. Compare the top results with the proposed website.
+        4.  **Negative Indicators**: The website is likely INCORRECT if it is a social media profile (Facebook, Instagram), a general business directory (e.g., Yellow Pages), a news article, or a blog post.
+        5.  **Correction**: If the proposed website is incorrect, you MUST perform a new search to find the correct official website.
+        
         **Output Requirement:**
-        Your entire response MUST be a single JSON object with two keys:
+        Your entire response MUST be a single JSON object with two keys. Do not add any other text.
         1.  \`isCorrect\`: A boolean value (\`true\` or \`false\`).
-        2.  \`correctedWebsite\`: A string. If \`isCorrect\` is \`true\`, this should be the original website URL. If \`isCorrect\` is \`false\`, this must be the URL of the correct official website you found. If you cannot find the correct website, return "Not Found".
+        2.  \`correctedWebsite\`: A string.
+            *   If \`isCorrect\` is \`true\`, this field MUST contain the original, validated website URL.
+            *   If \`isCorrect\` is \`false\`, this field MUST contain the URL of the correct official website you found.
+            *   If you cannot find the correct website after a thorough search, return "Not Found" in this field.
 
         **Example Response 1 (Correct):**
         {
@@ -305,7 +321,7 @@ const createValidationPrompt = (lead: BusinessLead): string => {
             "correctedWebsite": "https://www.the-original-site.com"
         }
 
-        **Example Response 2 (Incorrect):**
+        **Example Response 2 (Incorrect and Corrected):**
         {
             "isCorrect": false,
             "correctedWebsite": "https://www.the-actual-official-site.com"
