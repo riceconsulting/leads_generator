@@ -4,9 +4,10 @@ import { ClipboardIcon, CheckIcon } from './icons';
 
 interface CopyButtonProps {
   textToCopy: string;
+  t: (key: string) => string;
 }
 
-const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy }) => {
+const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy, t }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -30,12 +31,12 @@ const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy }) => {
       {copied ? (
         <>
           <CheckIcon className="h-4 w-4 mr-1.5" />
-          Copied
+          {t('copied')}
         </>
       ) : (
         <>
           <ClipboardIcon className="h-4 w-4 mr-1.5" />
-          Copy
+          {t('copy')}
         </>
       )}
     </button>

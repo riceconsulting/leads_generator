@@ -27,7 +27,8 @@ class AIServiceError extends Error {
 const parseJsonResponse = (text: string): any => {
     if (!text) {
         console.error("AI returned an empty response, cannot parse JSON.");
-        return {};
+        // Throw an error to make the failure explicit, which will be caught by the retry logic.
+        throw new Error("AI returned an empty response.");
     }
 
     // Attempt to find a JSON code block first. This is the most reliable method.
@@ -62,7 +63,8 @@ const parseJsonResponse = (text: string): any => {
 };
 
 /**
- * Wraps the generateContent call with a retry mechanism for transient errors.
+ * Wraps the generateContent call with a retry mechanism for transient errors
+ * and adds explicit checks for content blocking.
  */
 const generateContentWithRetry = async (
   request: any, // Using any as GenerateContentParameters is not exported
@@ -70,9 +72,34 @@ const generateContentWithRetry = async (
   delay = 1000
 ): Promise<GenerateContentResponse> => {
     try {
-        return await ai.models.generateContent(request);
+        const response = await ai.models.generateContent(request);
+
+        // Explicitly check for content blocking due to safety settings or other reasons.
+        // This provides clearer error messages to the user than a generic empty response.
+        if (response?.promptFeedback?.blockReason) {
+            console.error("Prompt was blocked. Reason:", response.promptFeedback.blockReason, "Details:", response.promptFeedback.safetyRatings);
+            throw new AIServiceError(`Your request was blocked. Reason: ${response.promptFeedback.blockReason}. Please revise your inputs and try again.`);
+        }
+        
+        if (response?.candidates?.[0]?.finishReason === 'SAFETY') {
+            console.error("Response was blocked due to safety settings:", response.candidates[0].safetyRatings);
+            throw new AIServiceError(`The generated response was blocked for safety reasons. This can happen with sensitive topics. Please adjust your request.`);
+        }
+
+        // A non-blocking response might still be empty. The calling function will handle this.
+        if (!response.text) {
+             console.warn("AI returned a response with no text content. This will trigger a retry. Full response:", JSON.stringify(response, null, 2));
+        }
+
+        return response;
     } catch (e: any) {
         const errorMessage = (e.message || '').toLowerCase();
+        
+        // An AIServiceError from our checks above should not be retried.
+        if (e instanceof AIServiceError) {
+            throw e;
+        }
+
         // Check for common server-side error messages and statuses
         const isServerError =
             errorMessage.includes('500') ||
@@ -113,7 +140,8 @@ const generateAndParseWithRetry = async (
             const response = await generateContentWithRetry(request, 2); 
             const parsed = parseJsonResponse(response.text);
 
-            // A simple validation to trigger a retry if the AI returns an empty object
+            // A simple validation to trigger a retry if the AI returns a valid but empty JSON object.
+            // This can happen if the AI returns "{}"
             if (parsed && Object.keys(parsed).length === 0) {
                  throw new Error("AI returned a valid but empty JSON object.");
             }
@@ -149,7 +177,7 @@ const generateAndParseWithRetry = async (
         throw lastError;
     }
     // Throw a more specific error for format issues
-    if (lastError && (lastError.message.includes("invalid format") || lastError.message.includes("empty JSON"))) {
+    if (lastError && (lastError.message.includes("invalid format") || lastError.message.includes("empty JSON") || lastError.message.includes("empty response"))) {
         throw new Error("The AI is having trouble formatting its response. This can be a temporary issue. Please try again.");
     }
     throw lastError || new Error("An unknown error occurred after multiple retries.");

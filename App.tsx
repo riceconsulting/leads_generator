@@ -7,9 +7,217 @@ import LeadForm from './components/LeadForm';
 import ResultsDisplay from './components/ResultsDisplay';
 import SavedLeadsModal from './components/SavedLeadsModal';
 import Footer from './components/Footer';
-import Tutorial from './components/Tutorial';
+
+const translations = {
+  en: {
+    appTitle: 'RICE AI - Leads Generator',
+    savedLeads: 'Saved Leads',
+    leadGeneratorTitle: 'Lead Generator',
+    leadGeneratorDescription: 'Define your ideal customer by specifying a location and industry. Our AI will then scan for businesses, perform deep-dive research into their operations and online presence, and craft personalized outreach messages to kickstart your sales conversations. Generated leads are automatically saved to prevent duplicates.',
+    targetLocation: 'Target Location',
+    industryKeywords: 'Industry / Keywords',
+    customIndustryKeywords: 'Custom Industry Keywords',
+    optional: 'Optional',
+    companyGrowthStage: 'Company Growth Stage',
+    any: 'Any',
+    small: 'Small',
+    medium: 'Medium',
+    large: 'Large',
+    enterprise: 'Enterprise',
+    numberOfBusinesses: 'Number of Businesses',
+    customResearchFocus: 'Custom Research Focus',
+    customResearchDescription: 'Ask the AI to do a deep dive on a specific topic. This will affect the research findings.',
+    other: 'Other',
+    customResearchPoint: 'Custom Research Point',
+    advancedOptions: 'Advanced Options',
+    senderName: 'Sender Name',
+    senderTitle: 'Sender Title',
+    yourCompanyName: 'Your Company Name',
+    yourCompanyEmail: 'Your Company Email',
+    yourCompanyWebsite: 'Your Company Website',
+    yourCompanyPhone: 'Your Company Phone',
+    emailMessageTemplate: 'Email Message Template',
+    emailTemplatePlaceholder: 'Use placeholders: {{businessName}}, {{contactPerson.name}}, {{keyWeaknessesIT[0]}}',
+    whatsappMessageTemplate: 'WhatsApp Message Template',
+    whatsappTemplatePlaceholder: 'Keep it brief. Uses the same placeholders as the email template.',
+    generateLeads: 'Generate Leads',
+    generating: 'Generating...',
+    dailyLimitReached: 'Daily Limit Reached',
+    generationsRemaining: (count: number) => `${count} generations remaining today.`,
+    noGenerationsRemaining: 'You have reached your daily generation limit.',
+    error: 'Error',
+    readyToStart: 'Ready to Start',
+    readyToStartDescription: 'Fill out the form above to generate your first set of leads.',
+    generatedLeads: 'Generated Leads',
+    aiAtWork: 'AI is at work...',
+    initializing: 'Initializing process...',
+    savedLeadsTitle: (count: number) => `Saved Leads (${count})`,
+    importText: 'Import Text',
+    importFile: 'Import File',
+    importing: 'Importing...',
+    exportCSV: 'Export CSV',
+    clearAll: 'Clear All',
+    noSavedLeads: 'No Saved Leads',
+    noSavedLeadsDescription: "You haven't saved any leads yet. Generate leads and they will be saved here automatically.",
+    business: 'Business',
+    contactPerson: 'Contact Person',
+    generalContact: 'General Contact',
+    website: 'Website',
+    deleteAllLeadsTitle: 'Delete All Leads',
+    deleteAllLeadsConfirmation: (count: number) => `Are you sure you want to permanently delete all ${count} saved leads? This action cannot be undone.`,
+    cancel: 'Cancel',
+    deleteAll: 'Delete All',
+    importFromTextTitle: 'Import Leads from Text',
+    importFromTextDescription: 'Paste comma-separated values (CSV) here. The first line must be the header.',
+    importFromTextHeaders: 'Required headers: "Business Name". Optional: "Website", "Contact Name", "Contact Title", "Emails", "Phones", "Description". Use a semicolon (;) to separate multiple emails or phones.',
+    importLeads: 'Import Leads',
+    footerText: 'Need a custom solution or more leads?',
+    contactUs: 'Contact Us',
+    languageName: 'English',
+    saved: 'Saved',
+    saving: 'Saving...',
+    showLess: 'Show Less',
+    viewFullDetails: 'View Full Details & Drafts',
+    copy: 'Copy',
+    copied: 'Copied',
+    techIndustry: 'Technology',
+    softwareIt: 'Software & IT Services',
+    ecommerce: 'E-commerce',
+    fintech: 'Fintech',
+    healthtech: 'Healthtech',
+    edutech: 'Edutech',
+    profServices: 'Professional Services',
+    marketingAd: 'Marketing & Advertising Agency',
+    consulting: 'Consulting Firm',
+    legal: 'Legal Services',
+    accounting: 'Accounting Services',
+    retailConsumer: 'Retail & Consumer Goods',
+    fashion: 'Fashion & Apparel',
+    foodBev: 'Food & Beverage',
+    homeGoods: 'Home Goods',
+    consumerElectronics: 'Consumer Electronics',
+    healthWellness: 'Health & Wellness',
+    hospitals: 'Hospitals & Clinics',
+    fitness: 'Fitness & Gyms',
+    wellnessSpa: 'Wellness & Spa',
+    pharma: 'Pharmaceuticals',
+    manufacturingLogistics: 'Manufacturing & Logistics',
+    autoManufacturing: 'Automotive Manufacturing',
+    electronicsManufacturing: 'Electronics Manufacturing',
+    supplyChain: 'Supply Chain & Logistics',
+    industrialGoods: 'Industrial Goods',
+    hospitalityTravel: 'Hospitality & Travel',
+    hotels: 'Hotels & Accomodation',
+    restaurants: 'Restaurants & Cafes',
+    travel: 'Travel & Tourism Agencies',
+  },
+  id: {
+    appTitle: 'RICE AI - Generator Prospek',
+    savedLeads: 'Prospek Tersimpan',
+    leadGeneratorTitle: 'Generator Prospek',
+    leadGeneratorDescription: 'Tentukan pelanggan ideal Anda dengan menentukan lokasi dan industri. AI kami akan memindai bisnis, melakukan riset mendalam terhadap operasi dan kehadiran online mereka, serta menyusun pesan penjangkauan yang dipersonalisasi untuk memulai percakapan penjualan Anda. Prospek yang dihasilkan disimpan secara otomatis untuk mencegah duplikasi.',
+    targetLocation: 'Lokasi Target',
+    industryKeywords: 'Industri / Kata Kunci',
+    customIndustryKeywords: 'Kata Kunci Industri Kustom',
+    optional: 'Opsional',
+    companyGrowthStage: 'Tahap Pertumbuhan Perusahaan',
+    any: 'Apa saja',
+    small: 'Kecil',
+    medium: 'Menengah',
+    large: 'Besar',
+    enterprise: 'Perusahaan Besar',
+    numberOfBusinesses: 'Jumlah Bisnis',
+    customResearchFocus: 'Fokus Riset Kustom',
+    customResearchDescription: 'Minta AI untuk melakukan penelusuran mendalam tentang topik tertentu. Ini akan memengaruhi temuan penelitian.',
+    other: 'Lainnya',
+    customResearchPoint: 'Poin Riset Kustom',
+    advancedOptions: 'Opsi Lanjutan',
+    senderName: 'Nama Pengirim',
+    senderTitle: 'Jabatan Pengirim',
+    yourCompanyName: 'Nama Perusahaan Anda',
+    yourCompanyEmail: 'Email Perusahaan Anda',
+    yourCompanyWebsite: 'Situs Web Perusahaan Anda',
+    yourCompanyPhone: 'Telepon Perusahaan Anda',
+    emailMessageTemplate: 'Template Pesan Email',
+    emailTemplatePlaceholder: 'Gunakan placeholder: {{businessName}}, {{contactPerson.name}}, {{keyWeaknessesIT[0]}}',
+    whatsappMessageTemplate: 'Template Pesan WhatsApp',
+    whatsappTemplatePlaceholder: 'Buat singkat. Gunakan placeholder yang sama dengan template email.',
+    generateLeads: 'Hasilkan Prospek',
+    generating: 'Menghasilkan...',
+    dailyLimitReached: 'Batas Harian Tercapai',
+    generationsRemaining: (count: number) => `${count} generasi tersisa hari ini.`,
+    noGenerationsRemaining: 'Anda telah mencapai batas generasi harian Anda.',
+    error: 'Kesalahan',
+    readyToStart: 'Siap Memulai',
+    readyToStartDescription: 'Isi formulir di atas untuk menghasilkan kumpulan prospek pertama Anda.',
+    generatedLeads: 'Prospek yang Dihasilkan',
+    aiAtWork: 'AI sedang bekerja...',
+    initializing: 'Memulai proses...',
+    savedLeadsTitle: (count: number) => `Prospek Tersimpan (${count})`,
+    importText: 'Impor Teks',
+    importFile: 'Impor File',
+    importing: 'Mengimpor...',
+    exportCSV: 'Export CSV',
+    clearAll: 'Hapus Semua',
+    noSavedLeads: 'Tidak Ada Prospek Tersimpan',
+    noSavedLeadsDescription: 'Anda belum menyimpan prospek apa pun. Hasilkan prospek dan mereka akan disimpan di sini secara otomatis.',
+    business: 'Bisnis',
+    contactPerson: 'Kontak Person',
+    generalContact: 'Kontak Umum',
+    website: 'Situs Web',
+    deleteAllLeadsTitle: 'Hapus Semua Prospek',
+    deleteAllLeadsConfirmation: (count: number) => `Apakah Anda yakin ingin menghapus secara permanen semua ${count} prospek yang disimpan? Tindakan ini tidak dapat dibatalkan.`,
+    cancel: 'Batal',
+    deleteAll: 'Hapus Semua',
+    importFromTextTitle: 'Impor Prospek dari Teks',
+    importFromTextDescription: 'Tempelkan nilai yang dipisahkan koma (CSV) di sini. Baris pertama harus berupa header.',
+    importFromTextHeaders: 'Header yang diperlukan: "Business Name". Opsional: "Website", "Contact Name", "Contact Title", "Emails", "Phones", "Description". Gunakan titik koma (;) untuk memisahkan beberapa email atau telepon.',
+    importLeads: 'Impor Prospek',
+    footerText: 'Butuh solusi khusus atau lebih banyak prospek?',
+    contactUs: 'Hubungi Kami',
+    languageName: 'Bahasa Indonesia',
+    saved: 'Tersimpan',
+    saving: 'Menyimpan...',
+    showLess: 'Tampilkan Sedikit',
+    viewFullDetails: 'Lihat Detail & Draf Lengkap',
+    copy: 'Salin',
+    copied: 'Tersalin',
+    techIndustry: 'Teknologi',
+    softwareIt: 'Perangkat Lunak & Layanan TI',
+    ecommerce: 'E-commerce',
+    fintech: 'Teknologi Finansial',
+    healthtech: 'Teknologi Kesehatan',
+    edutech: 'Teknologi Pendidikan',
+    profServices: 'Jasa Profesional',
+    marketingAd: 'Agensi Pemasaran & Periklanan',
+    consulting: 'Firma Konsultasi',
+    legal: 'Layanan Hukum',
+    accounting: 'Layanan Akuntansi',
+    retailConsumer: 'Ritel & Barang Konsumen',
+    fashion: 'Mode & Pakaian',
+    foodBev: 'Makanan & Minuman',
+    homeGoods: 'Peralatan Rumah Tangga',
+    consumerElectronics: 'Elektronik Konsumen',
+    healthWellness: 'Kesehatan & Kebugaran',
+    hospitals: 'Rumah Sakit & Klinik',
+    fitness: 'Kebugaran & Gym',
+    wellnessSpa: 'Kesehatan & Spa',
+    pharma: 'Farmasi',
+    manufacturingLogistics: 'Manufaktur & Logistik',
+    autoManufacturing: 'Manufaktur Otomotif',
+    electronicsManufacturing: 'Manufaktur Elektronik',
+    supplyChain: 'Rantai Pasokan & Logistik',
+    industrialGoods: 'Barang Industri',
+    hospitalityTravel: 'Perhotelan & Perjalanan',
+    hotels: 'Hotel & Akomodasi',
+    restaurants: 'Restoran & Kafe',
+    travel: 'Agensi Perjalanan & Pariwisata',
+  }
+};
+
 
 type Theme = 'light' | 'dark';
+type Language = 'en' | 'id';
 
 const App: React.FC = () => {
   const [leads, setLeads] = useState<BusinessLead[]>([]);
@@ -17,12 +225,26 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [showTutorial, setShowTutorial] = useState<boolean>(false);
-  const [tutorialDummyLead, setTutorialDummyLead] = useState<BusinessLead[] | null>(null);
-  const [isTutorialLoading, setIsTutorialLoading] = useState<boolean>(false);
   const [theme, setTheme] = useState<Theme>(localStorage.getItem('theme') as Theme || 'light');
+  const [language, setLanguage] = useState<Language>(localStorage.getItem('language') as Language || 'id');
   const [generationStatus, setGenerationStatus] = useState<string>('');
   const [generationProgress, setGenerationProgress] = useState<number>(0);
+
+  const t = useCallback((key: keyof typeof translations.en, ...args: any[]) => {
+    const translation = translations[language][key] || translations.en[key];
+    if (typeof translation === 'function') {
+      return translation(...args);
+    }
+    return translation as string;
+  }, [language]);
+  
+  useEffect(() => {
+    document.title = t('appTitle');
+  }, [t]);
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -45,10 +267,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
-    if (hasSeenTutorial !== 'true') {
-      setShowTutorial(true);
-    }
   }, [fetchData]);
   
   const handleSaveAllLeads = useCallback(async (leadsToSave: BusinessLead[]) => {
@@ -66,11 +284,11 @@ const App: React.FC = () => {
     }
   }, [fetchData]);
 
-  const handleGenerateLeads = useCallback(async (params: LeadGenerationParams) => {
+  const handleGenerateLeads = useCallback(async (formParams: Omit<LeadGenerationParams, 'language'>) => {
     setIsLoading(true);
     setError(null);
     setLeads([]);
-    setGenerationStatus('Initializing...');
+    setGenerationStatus(t('initializing'));
     setGenerationProgress(0);
 
     const handleProgressUpdate = ({ status, progress }: { status: string; progress: number }) => {
@@ -80,10 +298,14 @@ const App: React.FC = () => {
 
     try {
       const excludedBusinesses = savedLeads.map(lead => lead.businessName);
-      const results = await generateLeads({
-          ...params,
+      
+      const fullParams: LeadGenerationParams = {
+          ...formParams,
+          language: language === 'id' ? 'Bahasa Indonesia' : 'English',
           excludedBusinesses,
-      }, handleProgressUpdate);
+      };
+
+      const results = await generateLeads(fullParams, handleProgressUpdate);
       setLeads(results);
 
       // --- Auto-save leads ---
@@ -94,7 +316,7 @@ const App: React.FC = () => {
 
       // --- Send full audit log to Google Sheets via the serverless function ---
       const logData = {
-        ...params, // This includes all the advanced options
+        ...fullParams, // This includes all the advanced options
         generatedLeadsCount: results.length
       };
       
@@ -142,7 +364,7 @@ const App: React.FC = () => {
       setGenerationStatus('');
       setGenerationProgress(0);
     }
-  }, [savedLeads, handleSaveAllLeads]);
+  }, [savedLeads, handleSaveAllLeads, language, t]);
   
   const handleImportLeads = useCallback(async (importedLeads: BusinessLead[]) => {
     try {
@@ -168,94 +390,42 @@ const App: React.FC = () => {
     fetchData(); 
     setIsModalOpen(true);
   };
-  
-  const handleShowDummyLead = () => {
-    const dummyLead: BusinessLead = {
-      id: 'tutorial-lead-123',
-      businessName: 'Example Corp (Tutorial)',
-      officialWebsite: 'https://example.com',
-      contactPerson: { name: 'Jane Doe', title: 'Manager' },
-      companySizeCategory: 'Medium',
-      contactEmail: ['contact@example.com'],
-      contactPhone: ['555-1234'],
-      contactWhatsApp: '',
-      companyDescription: 'This is a sample lead to demonstrate the save feature.',
-      estimatedEmployeeCount: '50-100',
-      inferredPrimaryLanguage: 'English',
-      keyStrengthsIT: ['Modern Website'],
-      keyWeaknessesIT: ['Needs better SEO'],
-      customResearchResults: 'N/A',
-      draftEmail: { subject: 'Example Subject', body: 'This is a sample email body.', language: 'English', tone: 'Professional' },
-      draftWhatsApp: { body: 'Hi Jane!', language: 'English', tone: 'Conversational' }
-    };
-    setTutorialDummyLead([dummyLead]);
-    // Simulate auto-saving for the tutorial
-    setTimeout(() => {
-        setSavedLeads(prev => [...prev, dummyLead]);
-    }, 500);
-  };
-  
-  const handleStartDummyLeadGeneration = () => {
-    setTutorialDummyLead(null); // Clear any existing dummy lead
-    setIsTutorialLoading(true);
-    // Simulate loading for 3 seconds
-    setTimeout(() => {
-      setIsTutorialLoading(false);
-      handleShowDummyLead(); // Now show the dummy lead
-    }, 3000);
-  };
-
-  const handleFinishTutorial = () => {
-    setShowTutorial(false);
-    setTutorialDummyLead(null);
-    setIsTutorialLoading(false); // Ensure loading state is reset
-    setIsModalOpen(false); // Ensure modal is closed on finish
-    localStorage.setItem('hasSeenTutorial', 'true');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  
-  const handleOpenModalForTutorial = () => {
-    setIsModalOpen(true);
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark font-sans transition-colors duration-300">
-      {showTutorial && <Tutorial 
-        onFinish={handleFinishTutorial} 
-        onStartDummyLeadGeneration={handleStartDummyLeadGeneration} 
-        onOpenModal={handleOpenModalForTutorial} 
-      />}
-      
       <Header 
         onOpenModal={openModal} 
         savedLeadsCount={savedLeads.length}
         theme={theme}
         toggleTheme={toggleTheme}
+        language={language}
+        setLanguage={setLanguage}
+        t={t}
       />
       
       <main className="flex-grow container mx-auto p-4 sm:p-6 md:p-8 pb-24">
         <div className="max-w-5xl mx-auto">
           <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-lg mb-8">
-            <h2 className="text-2xl font-heading font-bold text-text-primary-light dark:text-text-primary-dark mb-2">Lead Generator</h2>
+            <h2 className="text-2xl font-heading font-bold text-text-primary-light dark:text-text-primary-dark mb-2">{t('leadGeneratorTitle')}</h2>
             <p className="text-text-secondary-light dark:text-text-secondary-dark mb-6">
-              Enter your target criteria below. The AI will identify potential clients, research their business, and generate personalized outreach messages. All generated leads are automatically saved and will be excluded from future searches.
+              {t('leadGeneratorDescription')}
             </p>
             <LeadForm 
               onGenerate={handleGenerateLeads} 
               isLoading={isLoading} 
               generationStatus={generationStatus}
               generationProgress={generationProgress}
+              t={t}
             />
           </div>
           <ResultsDisplay 
             isLoading={isLoading} 
             error={error} 
-            leads={tutorialDummyLead || leads}
+            leads={leads}
             savedLeadIds={savedLeads.map(l => l.id as string)}
-            isTutorialActive={!!tutorialDummyLead}
-            isTutorialLoading={isTutorialLoading}
             generationStatus={generationStatus}
             generationProgress={generationProgress}
+            t={t}
           />
         </div>
       </main>
@@ -266,9 +436,10 @@ const App: React.FC = () => {
         leads={savedLeads}
         onClearAll={handleClearAllLeads}
         onImport={handleImportLeads}
+        t={t}
       />
       
-      <Footer />
+      <Footer t={t} />
     </div>
   );
 };

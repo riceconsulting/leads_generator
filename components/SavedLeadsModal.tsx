@@ -9,9 +9,10 @@ interface SavedLeadsModalProps {
   leads: BusinessLead[];
   onClearAll: () => void;
   onImport: (leads: BusinessLead[]) => void;
+  t: (key: string, ...args: any[]) => string;
 }
 
-const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, leads, onClearAll, onImport }) => {
+const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, leads, onClearAll, onImport, t }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
@@ -185,11 +186,11 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                         <AlertTriangleIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
                     </div>
                     <h3 className="mt-4 text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">
-                        Delete All Leads
+                        {t('deleteAllLeadsTitle')}
                     </h3>
                     <div className="mt-2">
                         <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                            Are you sure you want to permanently delete all {leads.length} saved leads? This action cannot be undone.
+                            {t('deleteAllLeadsConfirmation', leads.length)}
                         </p>
                     </div>
                 </div>
@@ -199,14 +200,14 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                         onClick={() => setShowConfirmClear(false)}
                         className="inline-flex justify-center w-full rounded-md border border-border-light dark:border-border-dark px-4 py-2 bg-surface-light dark:bg-surface-dark text-base font-medium text-text-primary-light dark:text-text-primary-dark shadow-sm hover:bg-background-light dark:hover:bg-border-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light dark:focus:ring-offset-surface-dark transition-colors"
                     >
-                        Cancel
+                        {t('cancel')}
                     </button>
                     <button
                         type="button"
                         onClick={handleConfirmClear}
                         className="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-600 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                     >
-                        Delete All
+                        {t('deleteAll')}
                     </button>
                 </div>
             </div>
@@ -217,17 +218,17 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
         <div className="fixed inset-0 bg-black bg-opacity-60 z-[60] flex justify-center items-center p-4" onClick={() => setIsTextImportOpen(false)}>
             <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh] animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
                 <div className="flex justify-between items-center p-4 border-b border-border-light dark:border-border-dark">
-                    <h3 className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark">Import Leads from Text</h3>
+                    <h3 className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark">{t('importFromTextTitle')}</h3>
                       <button onClick={() => setIsTextImportOpen(false)} className="text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark">
                         <XIcon className="h-6 w-6" />
                       </button>
                 </div>
                 <div className="p-6 flex-grow overflow-y-auto">
                     <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-2">
-                        Paste comma-separated values (CSV) here. The first line must be the header.
+                        {t('importFromTextDescription')}
                     </p>
                     <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mb-4">
-                        Required headers: <strong>"Business Name"</strong>. Optional: "Website", "Contact Name", "Contact Title", "Emails", "Phones", "Description". Use a semicolon (;) to separate multiple emails or phones.
+                        {t('importFromTextHeaders')}
                     </p>
                     <textarea
                         value={textImportValue}
@@ -244,10 +245,10 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                 </div>
                 <div className="flex justify-end items-center p-4 bg-background-light dark:bg-surface-dark/50 border-t border-border-light dark:border-border-dark rounded-b-xl">
                     <button onClick={() => setIsTextImportOpen(false)} className="px-4 py-2 text-sm font-medium rounded-md mr-2 text-text-secondary-light dark:text-text-secondary-dark hover:bg-border-light dark:hover:bg-border-dark">
-                        Cancel
+                        {t('cancel')}
                     </button>
                     <button onClick={handleTextImportSubmit} disabled={isImporting || !textImportValue} className={primaryButtonStyles}>
-                      {isImporting ? 'Importing...' : <><UploadIcon className="h-4 w-4 mr-2" /> Import Leads</>}
+                      {isImporting ? t('importing') : <><UploadIcon className="h-4 w-4 mr-2" /> {t('importLeads')}</>}
                     </button>
                 </div>
             </div>
@@ -257,20 +258,20 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4" onClick={onClose}>
         <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
           <div className="flex flex-wrap justify-between items-center p-4 md:p-6 border-b border-border-light dark:border-border-dark gap-4">
-            <h2 className="text-xl md:text-2xl font-heading font-bold text-text-primary-light dark:text-text-primary-dark">Saved Leads ({leads.length})</h2>
+            <h2 className="text-xl md:text-2xl font-heading font-bold text-text-primary-light dark:text-text-primary-dark">{t('savedLeadsTitle', leads.length)}</h2>
             <div className="flex flex-wrap items-center justify-end gap-2 md:gap-3">
               <button onClick={handleTextImportClick} disabled={isImporting} className={secondaryButtonStyles}>
-                  <FileTextIcon className="h-4 w-4 mr-2" /> Import Text
+                  <FileTextIcon className="h-4 w-4 mr-2" /> {t('importText')}
               </button>
               <button onClick={handleImportClick} disabled={isImporting} className={primaryButtonStyles}>
-                  <UploadIcon className="h-4 w-4 mr-2" /> {isImporting ? 'Importing...' : 'Import File'}
+                  <UploadIcon className="h-4 w-4 mr-2" /> {isImporting ? t('importing') : t('importFile')}
               </button>
               <button id="export-csv-button" onClick={handleExport} disabled={leads.length === 0} className={primaryButtonStyles}>
-                  <DownloadIcon className="h-4 w-4 mr-2" /> Export CSV
+                  <DownloadIcon className="h-4 w-4 mr-2" /> {t('exportCSV')}
               </button>
               <button onClick={handleClear} disabled={leads.length === 0} className={destructiveButtonStyles}>
                   <TrashIcon className="h-4 w-4 mr-2" />
-                  Clear All
+                  {t('clearAll')}
               </button>
               <button onClick={onClose} className="text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark ml-2">
                 <XIcon className="h-6 w-6" />
@@ -283,18 +284,18 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
               {leads.length === 0 ? (
                 <div className="text-center py-20 px-6">
                   <InfoIcon className="mx-auto h-16 w-16 text-text-secondary-dark" />
-                  <h3 className="mt-4 text-xl font-medium text-text-primary-light dark:text-text-primary-dark">No Saved Leads</h3>
-                  <p className="mt-2 text-base text-text-secondary-light dark:text-text-secondary-dark">You haven't saved any leads yet. Use the 'Save' button on a generated lead card to add it here.</p>
+                  <h3 className="mt-4 text-xl font-medium text-text-primary-light dark:text-text-primary-dark">{t('noSavedLeads')}</h3>
+                  <p className="mt-2 text-base text-text-secondary-light dark:text-text-secondary-dark">{t('noSavedLeadsDescription')}</p>
                 </div>
               ) : (
                 <div className="p-1">
                   <table className="min-w-full">
                     <thead className="hidden md:table-header-group bg-background-light dark:bg-border-dark">
                       <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Business</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Contact Person</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">General Contact</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Website</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">{t('business')}</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">{t('contactPerson')}</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">{t('generalContact')}</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">{t('website')}</th>
                       </tr>
                     </thead>
                     <tbody className="bg-surface-light dark:bg-surface-dark">
@@ -306,7 +307,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                           <tr key={lead.id} className="block mb-4 p-4 rounded-lg shadow-md md:table-row md:shadow-none md:mb-0 border md:border-b md:border-t-0 md:border-x-0 border-border-light dark:border-border-dark">
                             
                             <td className="flex justify-between items-center py-2 md:table-cell md:px-6 md:py-4 md:w-2/5">
-                               <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">Business</span>
+                               <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">{t('business')}</span>
                                <div className="text-right md:text-left">
                                   <div className="flex items-center">
                                     <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-primary-light/20 dark:bg-primary-dark/20 rounded-full">
@@ -321,7 +322,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                             </td>
 
                              <td className="flex justify-between items-center py-2 border-t border-border-light dark:border-border-dark md:table-cell md:px-6 md:py-4 md:border-t-0">
-                               <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">Contact Person</span>
+                               <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">{t('contactPerson')}</span>
                                <div className="text-right md:text-left">
                                 {lead.contactPerson && lead.contactPerson.name !== 'Not Found' ? (
                                     <div className="flex items-center">
@@ -340,7 +341,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                              </td>
 
                             <td className="flex justify-between items-center py-2 border-t border-border-light dark:border-border-dark md:table-cell md:px-6 md:py-4 md:border-t-0">
-                              <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">General Contact</span>
+                              <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">{t('generalContact')}</span>
                               <div className="text-right md:text-left text-sm text-text-secondary-light dark:text-text-secondary-dark break-words">
                                 <div className="flex items-center justify-end md:justify-start mb-1">
                                   <MailIcon className="h-4 w-4 mr-2 flex-shrink-0" /> {emails.join(', ') || 'N/A'}
@@ -352,7 +353,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                             </td>
 
                             <td className="flex justify-between items-center py-2 border-t border-border-light dark:border-border-dark md:table-cell md:px-6 md:py-4 md:border-t-0">
-                               <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">Website</span>
+                               <span className="text-xs font-bold uppercase text-text-secondary-light dark:text-text-secondary-dark md:hidden mr-2">{t('website')}</span>
                                <div className="text-right md:text-left text-sm">
                                   <a href={lead.officialWebsite} target="_blank" rel="noopener noreferrer" className="text-accent-light dark:text-accent-dark hover:underline break-all">
                                     {lead.officialWebsite}

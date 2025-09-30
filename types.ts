@@ -60,5 +60,4 @@ export interface LeadCardProps {
   lead: BusinessLead;
   onSave: (lead: BusinessLead) => void;
   isSaved: boolean;
-  isTutorialCard?: boolean; // <-- This line is added
 }

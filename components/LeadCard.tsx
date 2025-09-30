@@ -6,7 +6,7 @@ import CopyButton from './CopyButton';
 interface LeadCardProps {
   lead: BusinessLead;
   isSaved: boolean;
-  isTutorialCard?: boolean;
+  t: (key: string) => string;
 }
 
 const InfoItem: React.FC<{ icon: React.ReactNode; label: string; value: React.ReactNode; isLink?: boolean; href?: string }> = ({ icon, label, value, isLink, href }) => (
@@ -63,7 +63,7 @@ const CollapsibleList: React.FC<{ items: string[] }> = ({ items }) => {
     );
 };
 
-const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, isTutorialCard }) => {
+const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, t }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const contact = lead.contactPerson;
   // Ensure contactEmail and contactPhone are always arrays to prevent .join() errors
@@ -142,18 +142,17 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, isTutorialCard }) =>
                 </div>
             </div>
             <div
-                id={isTutorialCard ? 'tutorial-save-button' : undefined}
                 className="px-4 py-2 text-sm font-medium rounded-md flex items-center"
             >
                 {isSaved ? (
                     <>
                         <CheckCircleIcon className="h-4 w-4 mr-2 text-green-500" />
-                        <span className="text-text-primary-light dark:text-text-primary-dark">Saved</span>
+                        <span className="text-text-primary-light dark:text-text-primary-dark">{t('saved')}</span>
                     </>
                 ) : (
                     <>
                         <SaveIcon className="h-4 w-4 mr-2 animate-spin" />
-                        <span className="text-text-secondary-light dark:text-text-secondary-dark">Saving...</span>
+                        <span className="text-text-secondary-light dark:text-text-secondary-dark">{t('saving')}</span>
                     </>
                 )}
             </div>
@@ -187,7 +186,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, isTutorialCard }) =>
                     <MailIcon className="h-5 w-5 mr-2" />
                     Draft Email ({lead.draftEmail.tone})
                 </h4>
-                <CopyButton textToCopy={fullEmailText} />
+                <CopyButton textToCopy={fullEmailText} t={t} />
             </div>
             <div className="p-4 bg-surface-light dark:bg-border-dark rounded-lg border border-border-light dark:border-border-dark text-sm">
                 <p className="font-semibold text-text-primary-light dark:text-text-primary-dark">Subject: {lead.draftEmail.subject}</p>
@@ -203,7 +202,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, isTutorialCard }) =>
                     <MessageSquareIcon className="h-5 w-5 mr-2" />
                     Draft WhatsApp ({lead.draftWhatsApp.tone})
                 </h4>
-                <CopyButton textToCopy={lead.draftWhatsApp.body} />
+                <CopyButton textToCopy={lead.draftWhatsApp.body} t={t} />
             </div>
               <div className="p-4 bg-surface-light dark:bg-border-dark rounded-lg border border-border-light dark:border-border-dark text-sm">
                 <p className="whitespace-pre-wrap text-text-secondary-light dark:text-text-secondary-dark">{lead.draftWhatsApp.body}</p>
@@ -215,7 +214,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, isTutorialCard }) =>
       {/* Toggle Button in the footer of the card */}
       <div className="border-t border-border-light dark:border-border-dark bg-surface-light/80 dark:bg-surface-dark/80 px-6 py-2">
             <button onClick={() => setIsExpanded(!isExpanded)} className="w-full flex justify-center items-center text-sm font-semibold text-accent-light dark:text-accent-dark hover:underline focus:outline-none focus:ring-2 focus:ring-primary-light rounded">
-                <span>{isExpanded ? 'Show Less' : 'View Full Details & Drafts'}</span>
+                <span>{isExpanded ? t('showLess') : t('viewFullDetails')}</span>
                 <ChevronDownIcon className={`h-5 w-5 ml-2 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
             </button>
       </div>

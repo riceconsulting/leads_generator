@@ -4,9 +4,10 @@ import { BotIcon } from './icons';
 interface LoadingDisplayProps {
   status: string;
   progress: number;
+  t: (key: string) => string;
 }
 
-const LoadingDisplay: React.FC<LoadingDisplayProps> = ({ status, progress }) => {
+const LoadingDisplay: React.FC<LoadingDisplayProps> = ({ status, progress, t }) => {
   const showDeterminate = progress > 0;
 
   return (
@@ -14,7 +15,7 @@ const LoadingDisplay: React.FC<LoadingDisplayProps> = ({ status, progress }) => 
       {/* Swapped bounce for pulse animation, which is more subtle and less distracting */}
       <BotIcon className="h-12 w-12 text-primary-light dark:text-primary-dark animate-pulse" />
       <h3 className="mt-4 text-lg font-heading font-semibold text-text-primary-light dark:text-text-primary-dark">
-        AI is at work...
+        {t('aiAtWork')}
       </h3>
       {/* 
         Removed the problematic Typewriter effect.
@@ -25,7 +26,7 @@ const LoadingDisplay: React.FC<LoadingDisplayProps> = ({ status, progress }) => 
         key={status}
         className="mt-1 text-sm text-text-secondary-light dark:text-text-secondary-dark min-h-[2.5rem] flex items-center justify-center animate-fade-in"
       >
-        {status || 'Initializing process...'}
+        {status || t('initializing')}
       </p>
 
       {showDeterminate && (

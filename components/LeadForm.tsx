@@ -3,10 +3,11 @@ import { LeadGenerationParams } from '../types';
 import { SparklesIcon } from './icons';
 
 interface LeadFormProps {
-  onGenerate: (params: LeadGenerationParams) => void;
+  onGenerate: (params: Omit<LeadGenerationParams, 'language'>) => void;
   isLoading: boolean;
   generationStatus: string;
   generationProgress: number;
+  t: (key: string, ...args: any[]) => string;
 }
 
 const researchFocusOptions = [
@@ -30,7 +31,7 @@ const researchFocusOptions = [
     {
         category: "Infrastructure & Security",
         options: [
-            { value: 'Cybersecurity Posture Assessment', prompt: "Perform a non-intrusive, high-level assessment of the company's public cybersecurity posture. Check for SSL/TLS certificate validity, email security records (SPF, DMARC), and any publicly known vulnerabilities or data breaches." },
+            { value: 'Cybersecurity Posture Assessment', prompt: "Perform a non-intrusive, a high-level assessment of the company's public cybersecurity posture. Check for SSL/TLS certificate validity, email security records (SPF, DMARC), and any publicly known vulnerabilities or data breaches." },
             { value: 'Cloud Infrastructure & Service Adoption', prompt: "Investigate if there are public signs of cloud service adoption. Look for DNS records, job postings mentioning AWS, Azure, or Google Cloud, or technology stack information that points to specific cloud services." },
             { value: 'Data & Analytics Capabilities', prompt: 'Look for evidence of their data and analytics capabilities. Check job postings for roles like "Data Analyst" or "Data Scientist". Identify any analytics tools (e.g., Google Analytics, Hotjar) embedded on their website.' }
         ]
@@ -46,6 +47,9 @@ const researchFocusOptions = [
         ]
     },
 ];
+
+const locationSuggestions = ['Jakarta, Indonesia', 'Bandung, Indonesia', 'Global', 'Singapore'];
+const industrySuggestions = ['Manufacturing', 'Software & IT Services', 'E-commerce', 'Logistics', 'Restaurants & Cafes', 'Marketing Agency'];
 
 // --- Cookie Helper Functions ---
 const setDailyCookie = (name: string, value: string) => {
@@ -67,14 +71,13 @@ const getCookie = (name: string): string | null => {
 };
 // --- End Cookie Helper Functions ---
 
-const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationStatus, generationProgress }) => {
+const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationStatus, generationProgress, t }) => {
   const [location, setLocation] = useState('Surabaya, Indonesia');
   const [keywords, setKeywords] = useState('manufacturing');
   const [count, setCount] = useState(3);
   const [companyGrowthStage, setCompanyGrowthStage] = useState('Any');
 
   // Advanced Options State
-  const [language, setLanguage] = useState('');
   const [customResearchType, setCustomResearchType] = useState('General Business SWOT Analysis');
   const [customResearchText, setCustomResearchText] = useState('');
   const [senderName, setSenderName] = useState('');
@@ -126,7 +129,6 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
         keywords, 
         count, 
         companyGrowthStage,
-        language: language || 'English', // Default to English if empty
         customResearch,
         customResearchFocus: customResearchType,
         senderName,
@@ -150,6 +152,7 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
   const formInputStyle = "w-full px-3 py-2 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:outline-none focus:ring-primary-light focus:border-primary-light dark:focus:ring-primary-dark dark:focus:border-primary-dark";
   const formLabelStyle = "block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1";
   const formDescriptionStyle = "mt-1 text-xs text-text-secondary-light dark:text-text-secondary-dark";
+  const suggestionButtonStyle = "px-2 py-1 text-xs font-medium text-text-secondary-light dark:text-text-primary-dark bg-background-light dark:bg-border-dark border border-border-light dark:border-border-dark rounded-full hover:bg-border-light dark:hover:bg-surface-dark transition-colors";
   const generationsLeft = RATE_LIMIT - generationCount;
 
   return (
@@ -157,25 +160,49 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
       {/* Basic Options */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="target-location-input" className={formLabelStyle}>Target Location</label>
+          <label htmlFor="target-location-input" className={formLabelStyle}>{t('targetLocation')}</label>
           <input type="text" id="target-location-input" value={location} onChange={(e) => setLocation(e.target.value)} className={formInputStyle} placeholder="e.g., San Francisco Bay Area" required />
+          <div className="flex flex-wrap gap-2 mt-2">
+            {locationSuggestions.map(suggestion => (
+                <button
+                    type="button"
+                    key={suggestion}
+                    onClick={() => setLocation(suggestion)}
+                    className={suggestionButtonStyle}
+                >
+                    {suggestion}
+                </button>
+            ))}
+          </div>
         </div>
         <div>
-          <label htmlFor="keywords" className={formLabelStyle}>Industry Keywords <span className="text-slate-400">(Optional)</span></label>
-          <input type="text" id="keywords" value={keywords} onChange={(e) => setKeywords(e.target.value)} className={formInputStyle} placeholder="e.g., retail, healthcare, logistics" />
+            <label htmlFor="industry-keywords-input" className={formLabelStyle}>{t('industryKeywords')}</label>
+            <input type="text" id="industry-keywords-input" value={keywords} onChange={(e) => setKeywords(e.target.value)} className={formInputStyle} placeholder="e.g., E-commerce, Healthcare" required />
+            <div className="flex flex-wrap gap-2 mt-2">
+                {industrySuggestions.map(suggestion => (
+                    <button
+                        type="button"
+                        key={suggestion}
+                        onClick={() => setKeywords(suggestion)}
+                        className={suggestionButtonStyle}
+                    >
+                        {suggestion}
+                    </button>
+                ))}
+            </div>
         </div>
         <div>
-          <label htmlFor="growthStage" className={formLabelStyle}>Company Growth Stage</label>
+          <label htmlFor="growthStage" className={formLabelStyle}>{t('companyGrowthStage')}</label>
           <select id="growthStage" value={companyGrowthStage} onChange={(e) => setCompanyGrowthStage(e.target.value)} className={formInputStyle}>
-            <option value="Any">Any</option>
-            <option value="Small">Small</option>
-            <option value="Medium">Medium</option>
-            <option value="Large">Large</option>
-            <option value="Enterprise">Enterprise</option>
+            <option value="Any">{t('any')}</option>
+            <option value="Small">{t('small')}</option>
+            <option value="Medium">{t('medium')}</option>
+            <option value="Large">{t('large')}</option>
+            <option value="Enterprise">{t('enterprise')}</option>
           </select>
         </div>
         <div>
-          <label htmlFor="count" className={formLabelStyle}>Number of Businesses</label>
+          <label htmlFor="count" className={formLabelStyle}>{t('numberOfBusinesses')}</label>
           <select id="count" value={count} onChange={(e) => setCount(Number(e.target.value))} className={formInputStyle}>
             <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
           </select>
@@ -184,7 +211,7 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
       
       {/* Custom Research Focus */}
       <div className="pt-2">
-        <label htmlFor="customResearchType" className={formLabelStyle}>Custom Research Focus</label>
+        <label htmlFor="customResearchType" className={formLabelStyle}>{t('customResearchFocus')}</label>
         <select id="customResearchType" value={customResearchType} onChange={(e) => setCustomResearchType(e.target.value)} className={formInputStyle}>
           {researchFocusOptions.map(group => (
               <optgroup label={group.category} key={group.category}>
@@ -193,14 +220,14 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
                   ))}
               </optgroup>
           ))}
-          <option value="Other">Other</option>
+          <option value="Other">{t('other')}</option>
         </select>
-        <p className={formDescriptionStyle}>Ask the AI to do a deep dive on a specific topic. This will affect the research findings.</p>
+        <p className={formDescriptionStyle}>{t('customResearchDescription')}</p>
       </div>
 
       {customResearchType === 'Other' && (
         <div>
-          <label htmlFor="customResearchText" className={formLabelStyle}>Custom Research Point</label>
+          <label htmlFor="customResearchText" className={formLabelStyle}>{t('customResearchPoint')}</label>
           <textarea id="customResearchText" value={customResearchText} onChange={(e) => setCustomResearchText(e.target.value)} className={formInputStyle} rows={2} placeholder="e.g., 'What CRM do they use?' or 'Recent company news for a conversation starter'"></textarea>
         </div>
       )}
@@ -208,52 +235,46 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
       {/* Advanced Options Collapsible */}
       <details className="pt-2">
         <summary className="cursor-pointer text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:underline">
-          Advanced Options
+          {t('advancedOptions')}
         </summary>
         <div className="mt-4 p-4 space-y-4 bg-background-light dark:bg-background-dark/50 border border-border-light dark:border-border-dark rounded-lg">
           
-          <div>
-              <label htmlFor="language" className={formLabelStyle}>Target Language</label>
-              <input type="text" id="language" value={language} onChange={(e) => setLanguage(e.target.value)} className={formInputStyle} placeholder="Default: English" />
-              <p className={formDescriptionStyle}>Language for research and draft messages.</p>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                  <label htmlFor="senderName" className={formLabelStyle}>Sender Name</label>
+                  <label htmlFor="senderName" className={formLabelStyle}>{t('senderName')}</label>
                   <input type="text" id="senderName" value={senderName} onChange={(e) => setSenderName(e.target.value)} className={formInputStyle} placeholder="e.g., John Doe" />
               </div>
               <div>
-                  <label htmlFor="senderTitle" className={formLabelStyle}>Sender Title</label>
+                  <label htmlFor="senderTitle" className={formLabelStyle}>{t('senderTitle')}</label>
                   <input type="text" id="senderTitle" value={senderTitle} onChange={(e) => setSenderTitle(e.target.value)} className={formInputStyle} placeholder="e.g., Business Development Manager" />
               </div>
               <div>
-                  <label htmlFor="itCompanyName" className={formLabelStyle}>Your Company Name</label>
+                  <label htmlFor="itCompanyName" className={formLabelStyle}>{t('yourCompanyName')}</label>
                   <input type="text" id="itCompanyName" value={itCompanyName} onChange={(e) => setItCompanyName(e.target.value)} className={formInputStyle} placeholder="e.g., Tech Solutions Inc." />
               </div>
               <div>
-                  <label htmlFor="itCompanyEmail" className={formLabelStyle}>Your Company Email</label>
+                  <label htmlFor="itCompanyEmail" className={formLabelStyle}>{t('yourCompanyEmail')}</label>
                   <input type="email" id="itCompanyEmail" value={itCompanyEmail} onChange={(e) => setItCompanyEmail(e.target.value)} className={formInputStyle} placeholder="e.g., contact@techsolutions.com" />
               </div>
               <div>
-                  <label htmlFor="itCompanyWebsite" className={formLabelStyle}>Your Company Website</label>
+                  <label htmlFor="itCompanyWebsite" className={formLabelStyle}>{t('yourCompanyWebsite')}</label>
                   <input type="url" id="itCompanyWebsite" value={itCompanyWebsite} onChange={(e) => setItCompanyWebsite(e.target.value)} className={formInputStyle} placeholder="e.g., https://techsolutions.com" />
               </div>
               <div>
-                  <label htmlFor="itCompanyPhone" className={formLabelStyle}>Your Company Phone</label>
+                  <label htmlFor="itCompanyPhone" className={formLabelStyle}>{t('yourCompanyPhone')}</label>
                   <input type="tel" id="itCompanyPhone" value={itCompanyPhone} onChange={(e) => setItCompanyPhone(e.target.value)} className={formInputStyle} placeholder="e.g., +6212345678" />
               </div>
           </div>
 
           <div>
-              <label htmlFor="emailTemplate" className={formLabelStyle}>Email Message Template <span className="text-slate-400">(Optional)</span></label>
+              <label htmlFor="emailTemplate" className={formLabelStyle}>{t('emailMessageTemplate')} <span className="text-slate-400">({t('optional')})</span></label>
               <textarea id="emailTemplate" value={emailTemplate} onChange={(e) => setEmailTemplate(e.target.value)} className={formInputStyle} rows={4} placeholder="e.g., Hi {{contactPerson.name}}, I saw that {{businessName}} might need help with {{keyWeaknessesIT[0]}}. Let's connect."></textarea>
-              <p className={formDescriptionStyle}>Use placeholders: {"{{businessName}}"}, {"{{contactPerson.name}}"}, {"{{keyWeaknessesIT[0]}}"}</p>
+              <p className={formDescriptionStyle}>{t('emailTemplatePlaceholder')}</p>
           </div>
           <div>
-              <label htmlFor="whatsappTemplate" className={formLabelStyle}>WhatsApp Message Template <span className="text-slate-400">(Optional)</span></label>
+              <label htmlFor="whatsappTemplate" className={formLabelStyle}>{t('whatsappMessageTemplate')} <span className="text-slate-400">({t('optional')})</span></label>
               <textarea id="whatsappTemplate" value={whatsappTemplate} onChange={(e) => setWhatsappTemplate(e.target.value)} className={formInputStyle} rows={2} placeholder="e.g., Hi {{contactPerson.name}}, I saw an opportunity to improve the website for {{businessName}}. Quick chat?"></textarea>
-                <p className={formDescriptionStyle}>Keep it brief. Uses the same placeholders as the email template.</p>
+                <p className={formDescriptionStyle}>{t('whatsappTemplatePlaceholder')}</p>
           </div>
 
         </div>
@@ -280,20 +301,20 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                {generationStatus || 'Generating...'}
+                {generationStatus || t('generating')}
               </>
             ) : generationCount >= RATE_LIMIT ? (
-               'Daily Limit Reached'
+               t('dailyLimitReached')
             ) : (
               <>
                 <SparklesIcon className="h-5 w-5 mr-2" />
-                Generate Leads
+                {t('generateLeads')}
               </>
             )}
           </span>
         </button>
         <p className="text-center text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2">
-            {generationsLeft > 0 ? `${generationsLeft} generations remaining today.` : "You have reached your daily generation limit."}
+            {generationsLeft > 0 ? t('generationsRemaining', generationsLeft) : t('noGenerationsRemaining')}
         </p>
       </div>
     </form>
