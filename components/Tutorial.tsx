@@ -40,8 +40,8 @@ const tutorialSteps = [
   },
   {
     targetId: 'tutorial-save-button',
-    title: 'Save Your Leads',
-    content: 'Click "Save" to keep a lead. This prevents the AI from generating it again, helping you find new opportunities each time.',
+    title: 'Leads are Auto-Saved',
+    content: 'Generated leads are automatically saved. This status indicator will show "Saving..." then "Saved". Saved leads are excluded from future searches.',
     position: 'bottom',
   },
   {

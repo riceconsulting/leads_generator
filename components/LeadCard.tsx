@@ -5,7 +5,6 @@ import CopyButton from './CopyButton';
 
 interface LeadCardProps {
   lead: BusinessLead;
-  onSave: (lead: BusinessLead) => void;
   isSaved: boolean;
   isTutorialCard?: boolean;
 }
@@ -64,7 +63,7 @@ const CollapsibleList: React.FC<{ items: string[] }> = ({ items }) => {
     );
 };
 
-const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCard }) => {
+const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, isTutorialCard }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const contact = lead.contactPerson;
   // Ensure contactEmail and contactPhone are always arrays to prevent .join() errors
@@ -142,24 +141,22 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, onSave, isSaved, isTutorialCa
                     <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{lead.companySizeCategory} ({lead.inferredPrimaryLanguage})</p>
                 </div>
             </div>
-            <button
+            <div
                 id={isTutorialCard ? 'tutorial-save-button' : undefined}
-                onClick={() => onSave(lead)}
-                disabled={isSaved}
-                className="px-4 py-2 text-sm font-medium rounded-md flex items-center transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60 bg-primary-light text-white hover:brightness-95 dark:bg-primary-dark dark:hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light dark:focus:ring-offset-surface-dark dark:focus:ring-primary-dark"
+                className="px-4 py-2 text-sm font-medium rounded-md flex items-center"
             >
                 {isSaved ? (
                     <>
-                        <CheckCircleIcon className="h-4 w-4 mr-2" />
-                        Saved
+                        <CheckCircleIcon className="h-4 w-4 mr-2 text-green-500" />
+                        <span className="text-text-primary-light dark:text-text-primary-dark">Saved</span>
                     </>
                 ) : (
                     <>
-                        <SaveIcon className="h-4 w-4 mr-2" />
-                        Save
+                        <SaveIcon className="h-4 w-4 mr-2 animate-spin" />
+                        <span className="text-text-secondary-light dark:text-text-secondary-dark">Saving...</span>
                     </>
                 )}
-            </button>
+            </div>
         </div>
         <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{lead.companyDescription}</p>
       </div>

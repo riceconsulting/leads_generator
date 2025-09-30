@@ -50,6 +50,21 @@ const App: React.FC = () => {
       setShowTutorial(true);
     }
   }, [fetchData]);
+  
+  const handleSaveAllLeads = useCallback(async (leadsToSave: BusinessLead[]) => {
+    try {
+        for (const lead of leadsToSave) {
+            if (!lead.id) {
+                lead.id = `${lead.businessName}-${lead.officialWebsite}`;
+            }
+            await addLead(lead);
+        }
+    } catch(e) {
+        console.error("Error batch saving leads", e);
+    } finally {
+        await fetchData();
+    }
+  }, [fetchData]);
 
   const handleGenerateLeads = useCallback(async (params: LeadGenerationParams) => {
     setIsLoading(true);
@@ -70,6 +85,12 @@ const App: React.FC = () => {
           excludedBusinesses,
       }, handleProgressUpdate);
       setLeads(results);
+
+      // --- Auto-save leads ---
+      if (results.length > 0) {
+        await handleSaveAllLeads(results);
+      }
+      // --- End of auto-save ---
 
       // --- Send full audit log to Google Sheets via the serverless function ---
       const logData = {
@@ -121,34 +142,7 @@ const App: React.FC = () => {
       setGenerationStatus('');
       setGenerationProgress(0);
     }
-  }, [savedLeads]);
-
-  const handleSaveLead = useCallback(async (lead: BusinessLead) => {
-    if (!lead.id) {
-        lead.id = `${lead.businessName}-${lead.officialWebsite}`;
-    }
-    await addLead(lead);
-    await fetchData();
-  }, [fetchData]);
-
-  const handleSaveAllLeads = useCallback(async (leadsToSave: BusinessLead[]) => {
-    const leadsToAdd = leadsToSave.filter(lead => {
-        const leadId = lead.id || `${lead.businessName}-${lead.officialWebsite}`;
-        return !savedLeads.some(saved => saved.id === leadId);
-    });
-    try {
-        for (const lead of leadsToSave) {
-            if (!lead.id) {
-                lead.id = `${lead.businessName}-${lead.officialWebsite}`;
-            }
-            await addLead(lead);
-        }
-    } catch(e) {
-        console.error("Error batch saving leads", e);
-    } finally {
-        await fetchData();
-    }
-  }, [savedLeads, fetchData]);
+  }, [savedLeads, handleSaveAllLeads]);
   
   const handleImportLeads = useCallback(async (importedLeads: BusinessLead[]) => {
     try {
@@ -195,6 +189,10 @@ const App: React.FC = () => {
       draftWhatsApp: { body: 'Hi Jane!', language: 'English', tone: 'Conversational' }
     };
     setTutorialDummyLead([dummyLead]);
+    // Simulate auto-saving for the tutorial
+    setTimeout(() => {
+        setSavedLeads(prev => [...prev, dummyLead]);
+    }, 500);
   };
   
   const handleStartDummyLeadGeneration = () => {
@@ -240,7 +238,7 @@ const App: React.FC = () => {
           <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-lg mb-8">
             <h2 className="text-2xl font-heading font-bold text-text-primary-light dark:text-text-primary-dark mb-2">Lead Generator</h2>
             <p className="text-text-secondary-light dark:text-text-secondary-dark mb-6">
-              Enter your target criteria below. The AI will identify potential clients, research their business, and generate personalized outreach messages.
+              Enter your target criteria below. The AI will identify potential clients, research their business, and generate personalized outreach messages. All generated leads are automatically saved and will be excluded from future searches.
             </p>
             <LeadForm onGenerate={handleGenerateLeads} isLoading={isLoading} />
           </div>
@@ -249,8 +247,6 @@ const App: React.FC = () => {
             error={error} 
             leads={tutorialDummyLead || leads}
             savedLeadIds={savedLeads.map(l => l.id as string)}
-            onSaveLead={handleSaveLead}
-            onSaveAllLeads={handleSaveAllLeads}
             isTutorialActive={!!tutorialDummyLead}
             isTutorialLoading={isTutorialLoading}
             generationStatus={generationStatus}

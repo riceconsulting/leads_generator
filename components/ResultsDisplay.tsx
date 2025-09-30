@@ -9,8 +9,6 @@ interface ResultsDisplayProps {
   error: string | null;
   leads: BusinessLead[];
   savedLeadIds: string[];
-  onSaveLead: (lead: BusinessLead) => void;
-  onSaveAllLeads: (leads: BusinessLead[]) => void;
   isTutorialActive?: boolean;
   isTutorialLoading?: boolean;
   generationStatus: string;
@@ -21,9 +19,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     isLoading, 
     error, 
     leads, 
-    onSaveLead, 
     savedLeadIds, 
-    onSaveAllLeads, 
     isTutorialActive, 
     isTutorialLoading,
     generationStatus,
@@ -59,36 +55,17 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     );
   }
 
-  const unsavedLeads = leads.filter(lead => {
-    const leadId = lead.id || `${lead.businessName}-${lead.officialWebsite}`;
-    return !savedLeadIds.includes(leadId);
-  });
-  const unsavedLeadsCount = unsavedLeads.length;
-
   return (
     <div className="space-y-6 mb-24">
       <div id="results-display-container" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h3 className="text-xl font-heading font-bold text-text-primary-light dark:text-text-primary-dark">Generated Leads</h3>
-        {/* Hide Save All button during tutorial */}
-        {!isTutorialActive && leads.length > 0 && (
-            <button
-                // The duplicate ID has been removed from here
-                onClick={() => onSaveAllLeads(unsavedLeads)}
-                disabled={unsavedLeadsCount === 0}
-                className="px-4 py-2 text-sm font-medium rounded-md flex items-center transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60 bg-primary-light hover:brightness-95 dark:bg-primary-dark dark:hover:brightness-95 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light dark:focus:ring-offset-surface-dark dark:focus:ring-primary-dark"
-            >
-                <SaveIcon className="h-4 w-4 mr-2" />
-                {unsavedLeadsCount > 0 ? `Save All (${unsavedLeadsCount})` : 'All Saved'}
-            </button>
-        )}
       </div>
-      {leads.map((lead, index) => {
+      {leads.map((lead) => {
         const leadId = lead.id || `${lead.businessName}-${lead.officialWebsite}`;
         return (
           <LeadCard 
             key={leadId} 
             lead={lead} 
-            onSave={onSaveLead}
             isSaved={savedLeadIds.includes(leadId)}
             isTutorialCard={isTutorialActive} // Pass the flag down to LeadCard
           />
