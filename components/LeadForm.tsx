@@ -5,6 +5,8 @@ import { SparklesIcon } from './icons';
 interface LeadFormProps {
   onGenerate: (params: LeadGenerationParams) => void;
   isLoading: boolean;
+  generationStatus: string;
+  generationProgress: number;
 }
 
 const researchFocusOptions = [
@@ -65,7 +67,7 @@ const getCookie = (name: string): string | null => {
 };
 // --- End Cookie Helper Functions ---
 
-const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading }) => {
+const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationStatus, generationProgress }) => {
   const [location, setLocation] = useState('Surabaya, Indonesia');
   const [keywords, setKeywords] = useState('manufacturing');
   const [count, setCount] = useState(3);
@@ -263,22 +265,32 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading }) => {
           id="generate-leads-button"
           type="submit"
           disabled={isLoading || generationCount >= RATE_LIMIT}
-          className="w-full flex items-center justify-center px-4 py-3 bg-primary-light hover:brightness-95 dark:bg-primary-dark dark:hover:brightness-95 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light dark:focus:ring-offset-surface-dark dark:focus:ring-primary-dark disabled:bg-text-secondary-light disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          className="relative w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-primary-light to-accent-light dark:from-primary-dark dark:to-accent-dark text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light dark:focus:ring-offset-surface-dark dark:focus:ring-primary-dark disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-300 overflow-hidden active:scale-[0.98] transform-gpu"
         >
-          {isLoading ? (
-            <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Generating...
-            </>
-          ) : (
-            <>
-              <SparklesIcon className="h-5 w-5 mr-2" />
-              Generate Leads
-            </>
-          )}
+          {/* Progress bar background */}
+          <span 
+            className="absolute top-0 left-0 h-full bg-black/20 dark:bg-white/20 transition-all duration-500 ease-out"
+            style={{ width: `${isLoading ? generationProgress : 0}%` }}
+          />
+          {/* Button Content */}
+          <span className="relative z-10 flex items-center justify-center">
+            {isLoading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {generationStatus || 'Generating...'}
+              </>
+            ) : generationCount >= RATE_LIMIT ? (
+               'Daily Limit Reached'
+            ) : (
+              <>
+                <SparklesIcon className="h-5 w-5 mr-2" />
+                Generate Leads
+              </>
+            )}
+          </span>
         </button>
         <p className="text-center text-sm text-text-secondary-light dark:text-text-secondary-dark mt-2">
             {generationsLeft > 0 ? `${generationsLeft} generations remaining today.` : "You have reached your daily generation limit."}

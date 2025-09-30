@@ -240,7 +240,12 @@ const App: React.FC = () => {
             <p className="text-text-secondary-light dark:text-text-secondary-dark mb-6">
               Enter your target criteria below. The AI will identify potential clients, research their business, and generate personalized outreach messages. All generated leads are automatically saved and will be excluded from future searches.
             </p>
-            <LeadForm onGenerate={handleGenerateLeads} isLoading={isLoading} />
+            <LeadForm 
+              onGenerate={handleGenerateLeads} 
+              isLoading={isLoading} 
+              generationStatus={generationStatus}
+              generationProgress={generationProgress}
+            />
           </div>
           <ResultsDisplay 
             isLoading={isLoading} 
