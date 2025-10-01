@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BusinessLead } from '../types';
-import { BuildingIcon, MailIcon, PhoneIcon, GlobeIcon, CheckCircleIcon, XCircleIcon, MessageSquareIcon, SaveIcon, UserIcon, FileTextIcon, ChevronDownIcon } from './icons';
+import { BuildingIcon, MailIcon, PhoneIcon, GlobeIcon, CheckCircleIcon, XCircleIcon, MessageSquareIcon, SaveIcon, UserIcon, FileTextIcon, ChevronDownIcon, InstagramIcon } from './icons';
 import CopyButton from './CopyButton';
 
 interface LeadCardProps {
@@ -166,14 +166,21 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, t }) => {
             <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 pt-6">
                 <InfoItem icon={<GlobeIcon />} label="Website" value={lead.officialWebsite} isLink={true} href={lead.officialWebsite}/>
                 <InfoItem 
+                    icon={<InstagramIcon />} 
+                    label="Instagram" 
+                    value={lead.instagramHandle || 'Not Found'} 
+                    isLink={!!lead.instagramHandle && lead.instagramHandle.toLowerCase() !== 'not found'} 
+                    href={lead.instagramHandle ? `https://instagram.com/${lead.instagramHandle.replace('@', '')}` : undefined}
+                />
+                <InfoItem 
                     icon={<UserIcon />} 
                     label="Key Contact" 
                     value={contact && contact.name !== 'Not Found' ? `${contact.name} (${contact.title})` : 'Not Found'} 
                 />
+                <InfoItem icon={<BuildingIcon />} label="Est. Employees" value={lead.estimatedEmployeeCount} />
                 <InfoItem icon={<MailIcon />} label="Contact Emails" value={<CollapsibleList items={emails} />} />
                 <InfoItem icon={<PhoneIcon />} label="Contact Phones" value={<CollapsibleList items={phones} />} />
                 <InfoItem icon={<MessageSquareIcon />} label="WhatsApp Number" value={lead.contactWhatsApp || 'Not Found'} />
-                <InfoItem icon={<BuildingIcon />} label="Est. Employees" value={lead.estimatedEmployeeCount} />
             </dl>
             <ResearchFindings />
         </div>

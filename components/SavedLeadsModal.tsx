@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { BusinessLead } from '../types';
 import Papa from 'papaparse';
-import { InfoIcon, BuildingIcon, MailIcon, PhoneIcon, DownloadIcon, UploadIcon, AlertTriangleIcon, FileTextIcon, UserIcon, XIcon, TrashIcon } from './icons';
+import { InfoIcon, BuildingIcon, MailIcon, PhoneIcon, DownloadIcon, UploadIcon, AlertTriangleIcon, FileTextIcon, UserIcon, XIcon, TrashIcon, InstagramIcon } from './icons';
 
 interface SavedLeadsModalProps {
   isOpen: boolean;
@@ -35,6 +35,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
     const dataForCsv = leads.map(lead => ({
         'Business Name': lead.businessName,
         'Website': lead.officialWebsite,
+        'Instagram': lead.instagramHandle || '',
         'Contact Name': lead.contactPerson?.name || '',
         'Contact Title': lead.contactPerson?.title || '',
         'Emails': (Array.isArray(lead.contactEmail) ? lead.contactEmail : (lead.contactEmail ? [String(lead.contactEmail)] : [])).join('; '),
@@ -77,6 +78,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
       const importedLeads: BusinessLead[] = result.data.map((row: any, index: number) => {
         const businessName = row['Business Name'] || row['businessName'] || `Imported Lead ${index + 1}`;
         const officialWebsite = row['Website'] || row['website'] || 'Not Found';
+        const instagramHandle = row['Instagram'] || row['instagram'] || '';
         
         const emails = row['Emails'] || row['emails'] || '';
         const phones = row['Phones'] || row['phones'] || '';
@@ -85,6 +87,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
           id: `${businessName}-${officialWebsite}-${Date.now()}-${index}`, // Make it unique
           businessName: businessName,
           officialWebsite: officialWebsite,
+          instagramHandle: instagramHandle,
           contactPerson: {
             name: row['Contact Name'] || row['contactName'] || 'Not Found',
             title: row['Contact Title'] || row['contactTitle'] || '',
@@ -358,6 +361,14 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                                   <a href={lead.officialWebsite} target="_blank" rel="noopener noreferrer" className="text-accent-light dark:text-accent-dark hover:underline break-all">
                                     {lead.officialWebsite}
                                   </a>
+                                  {lead.instagramHandle && lead.instagramHandle.toLowerCase() !== 'not found' && (
+                                      <div className="flex items-center justify-end md:justify-start mt-1">
+                                          <InstagramIcon className="h-4 w-4 mr-2 text-text-secondary-light dark:text-text-secondary-dark" />
+                                          <a href={`https://instagram.com/${lead.instagramHandle.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-accent-light dark:text-accent-dark hover:underline break-all">
+                                            {lead.instagramHandle}
+                                          </a>
+                                      </div>
+                                  )}
                                </div>
                             </td>
                           </tr>

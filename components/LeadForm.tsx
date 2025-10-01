@@ -47,6 +47,7 @@ const researchFocusOptions = [
 
 const locationSuggestions = ['Jakarta, Indonesia', 'Bandung, Indonesia', 'Global', 'Singapore'];
 const industrySuggestions = ['Manufacturing', 'Software & IT Services', 'E-commerce', 'Logistics', 'Restaurants & Cafes', 'Marketing Agency'];
+const serviceSuggestions = ['IT Consulting Services', 'Digital Marketing Services', 'Custom Software Development', 'Cloud Infrastructure Solutions', 'Office Supplies', 'Logistics and Shipping Services'];
 
 // --- Cookie Helper Functions ---
 const setDailyCookie = (name: string, value: string) => {
@@ -77,6 +78,7 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
   // Advanced Options State
   const [customResearchType, setCustomResearchType] = useState('General Business SWOT Analysis');
   const [customResearchText, setCustomResearchText] = useState('');
+  const [serviceDescription, setServiceDescription] = useState('IT consulting services for business efficiency');
   const [senderName, setSenderName] = useState('');
   const [senderTitle, setSenderTitle] = useState('');
   const [itCompanyName, setItCompanyName] = useState('');
@@ -128,6 +130,7 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
         companyGrowthStage,
         customResearch,
         customResearchFocus: customResearchType,
+        serviceDescription,
         senderName,
         senderTitle,
         itCompanyName,
@@ -228,6 +231,33 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
           <textarea id="customResearchText" value={customResearchText} onChange={(e) => setCustomResearchText(e.target.value)} className={formInputStyle} rows={2} placeholder="e.g., 'What CRM do they use?' or 'Recent company news for a conversation starter'"></textarea>
         </div>
       )}
+
+      {/* Service / Product Offered */}
+      <div className="pt-2">
+        <label htmlFor="service-description-input" className={formLabelStyle}>{t('serviceOffered')}</label>
+        <input 
+          type="text" 
+          id="service-description-input" 
+          value={serviceDescription} 
+          onChange={(e) => setServiceDescription(e.target.value)} 
+          className={formInputStyle} 
+          placeholder="e.g., High-performance web development" 
+          required 
+        />
+         <p className={formDescriptionStyle}>{t('serviceOfferedDescription')}</p>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {serviceSuggestions.map(suggestion => (
+              <button
+                  type="button"
+                  key={suggestion}
+                  onClick={() => setServiceDescription(suggestion)}
+                  className={suggestionButtonStyle}
+              >
+                  {suggestion}
+              </button>
+          ))}
+        </div>
+      </div>
 
       {/* Advanced Options Collapsible */}
       <details className="pt-2">

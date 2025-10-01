@@ -221,7 +221,7 @@ const createCompanyListPrompt = (params: LeadGenerationParams): string => {
 const createLeadDetailPrompt = (params: LeadGenerationParams, companyName: string): string => {
     const { 
         language, customResearch, senderName, senderTitle, itCompanyName,
-        itCompanyWebsite, itCompanyPhone, itCompanyEmail,
+        itCompanyWebsite, itCompanyPhone, itCompanyEmail, serviceDescription,
         emailTemplate, whatsappTemplate
     } = params;
     
@@ -242,10 +242,16 @@ You must assess the company size and categorize it into one of the following: "S
 You must use your best judgment to apply these labels. If the user specified a target growth stage, you MUST only find companies that fit that stage.
 `;
 
+    const ourOfferingInstruction = `
+**OUR OFFERING**:
+The service/product we are offering to the target company is: "${serviceDescription}". This is the core value proposition you must weave into the outreach messages.
+`;
+
     const emailTemplateInstruction = emailTemplate
         ? `
 * **Email Generation (User Template)**:
     * You MUST use the user-provided template below.
+    * **CRITICAL CONTEXT**: You must adapt the template to connect OUR OFFERING ("${serviceDescription}") with the specific 'keyWeaknessesIT' you discovered for the company.
     * Replace placeholders like {{businessName}}, {{contactPerson.name}}, and {{keyWeaknessesIT[0]}} (use the first weakness). If a placeholder value isn't found, use a generic alternative (e.g., "your company" for {{businessName}}).
     * The email body must end with the full sender signature, constructed according to the SENDER SIGNATURE RULE.
     * **Template**: "${emailTemplate}"
@@ -253,8 +259,8 @@ You must use your best judgment to apply these labels. If the user specified a t
         : `
 * **Email Generation (Default)**:
     * Address the email to the 'contactPerson' if found. Otherwise, use a general greeting.
-    * **CRITICAL LOGIC**: First, check the 'keyWeaknessesIT' list. If you found one or more weaknesses, your email MUST reference the most significant weakness as a talking point to demonstrate your research.
-    * **If AND ONLY IF the 'keyWeaknessesIT' list is empty**, then generate a more general but still personalized introduction. Mention the company by name, introduce our services briefly, and offer a 'free, no-obligation IT assessment' to explore potential areas for improvement.
+    * **CRITICAL LOGIC**: First, check the 'keyWeaknessesIT' list. If you found one or more weaknesses, your email MUST reference the most significant weakness and persuasively position OUR OFFERING ("${serviceDescription}") as the direct solution to that specific problem.
+    * **If AND ONLY IF the 'keyWeaknessesIT' list is empty**, then generate a more general but still personalized introduction. Mention the company by name, introduce OUR OFFERING ("${serviceDescription}") in a compelling way, and offer a relevant call-to-action (e.g., a 'free consultation' or 'demo').
     * The email body must end with the full sender signature, constructed according to the SENDER SIGNATURE RULE.
 `;
 
@@ -262,6 +268,7 @@ You must use your best judgment to apply these labels. If the user specified a t
         ? `
 * **WhatsApp Message Generation (User Template)**:
     * You MUST use the user-provided template below. It must be very short and conversational.
+    * **CRITICAL CONTEXT**: Adapt the template to connect OUR OFFERING ("${serviceDescription}") to a 'keyWeaknessesIT' you discovered.
     * Replace placeholders like {{businessName}}, {{contactPerson.name}}, and {{keyWeaknessesIT[0]}}.
     * Do NOT use a formal signature.
     * **Template**: "${whatsappTemplate}"
@@ -269,9 +276,9 @@ You must use your best judgment to apply these labels. If the user specified a t
         : `
 * **WhatsApp Message Generation (Default)**:
     * **CRITICAL**: The WhatsApp message MUST be very short, conversational, and friendly. Do NOT use a formal email structure or signature block.
-    * **Template**: \`[Greeting] [Contact Name], saya [Sender Name] dari [IT Company Name]. Saya lihat [mention a specific IT weakness found]. Tertarik untuk diskusi singkat tentang ini? Terima kasih.\`
-    * **Example (Bahasa)**: \`Halo Pak Budi, saya Harris dari RICE AI Consulting. Saya lihat website Toko ABC sepertinya bisa lebih cepat. Tertarik untuk ngobrol santai soal ini? Thanks.\`
-    * **Example (English)**: \`Hi John, this is Harris from RICE AI. Noticed your site could use a mobile performance boost. Open to a quick chat about it? Thanks.\`
+    * **Template**: \`[Greeting] [Contact Name], saya [Sender Name] dari [IT Company Name]. Saya lihat [mention a specific IT weakness found] dan kami bisa membantu dengan [briefly mention OUR OFFERING: "${serviceDescription}"]. Tertarik untuk diskusi singkat tentang ini? Terima kasih.\`
+    * **Example (Bahasa)**: \`Halo Pak Budi, saya Harris dari RICE AI. Saya lihat website Toko ABC sepertinya bisa lebih cepat. Kami spesialis di optimasi web. Tertarik untuk ngobrol santai soal ini? Thanks.\`
+    * **Example (English)**: \`Hi John, this is Harris from RICE AI. Noticed your site could use a mobile performance boost. We specialize in exactly that. Open to a quick chat about it? Thanks.\`
     * The goal is to start a conversation. Keep it under 3 sentences.
 `;
 
@@ -297,6 +304,7 @@ You must use your best judgment to apply these labels. If the user specified a t
         **Phase 1: Foundational Research & Website Identification**
         1.  **Identify Official Website**: This is the most critical first step. Use search queries like \`"${companyName}" official website\`.
         2.  **Verify Legitimacy**: The website must belong to an operational business. You MUST disregard directories (e.g., Yellow Pages), social media profiles, news articles, and B2B marketplaces as the official website. The official website is the primary source for the next steps. All text output must be in the target language: **${language}**.
+        3.  **Find Instagram Handle**: Search for the company's official Instagram page using queries like \`"${companyName}" instagram\`. You must extract only the handle (e.g., @companyhandle).
 
         **Phase 2: Meticulous Contact Discovery Protocol**
         1.  **Target Decision-Maker**: Your primary goal is to find a key decision-maker (e.g., Owner, CEO, CTO, IT Manager, Head of Technology, Marketing Director). Use advanced Google searches like \`site:linkedin.com/in "${companyName}" "CEO"\` to find profiles and identify the correct person and their exact 'title'. The 'name' MUST be a person's full name, not the company name.
@@ -312,6 +320,8 @@ You must use your best judgment to apply these labels. If the user specified a t
         2.  Infer the \`inferredPrimaryLanguage\` based on the website's content.
         3.  ${companySizeInstruction}
         4.  ${customResearchInstruction}
+
+        ${ourOfferingInstruction}
 
         **Phase 4: Personalized Outreach Generation in ${language}**
         1.  **SENDER SIGNATURE RULE**: ${senderSignatureRule}
@@ -333,6 +343,7 @@ You must use your best judgment to apply these labels. If the user specified a t
             {
               "businessName": "string // The official company name.",
               "officialWebsite": "string // The full, correct URL. 'Not Found' if undiscoverable.",
+              "instagramHandle": "string // The official Instagram handle (e.g., @handle), or 'Not Found'.",
               "contactPerson": {
                 "name": "string // Full name of a decision-maker. 'Not Found' if none.",
                 "title": "string // Their job title."

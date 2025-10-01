@@ -1,4 +1,5 @@
 
+
 export interface AuditLogEntry extends LeadGenerationParams {
   id: number;
   timestamp: string;
@@ -14,6 +15,7 @@ export interface LeadGenerationParams {
   language: string;
   customResearch?: string;
   customResearchFocus?: string;
+  serviceDescription: string;
   senderName: string;
   senderTitle: string;
   itCompanyName: string;
@@ -40,6 +42,7 @@ export interface BusinessLead {
   id?: string; // Unique identifier for DB
   businessName: string;
   officialWebsite: string;
+  instagramHandle?: string;
   contactEmail: string[];
   contactPhone: string[];
   contactWhatsApp?: string;
