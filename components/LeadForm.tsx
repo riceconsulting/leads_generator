@@ -11,39 +11,36 @@ interface LeadFormProps {
 }
 
 const researchFocusOptions = [
-    { 
-        category: "Website & Online Presence",
+    {
+        category: "Business Strategy & Market Position",
         options: [
-            { value: 'Website Performance & Technical SEO', prompt: 'Analyze the official website for performance (loading speed, mobile-friendliness using Google PageSpeed Insights concepts), technical SEO (sitemap, robots.txt, meta tags), and security headers.' },
-            { value: 'Content & On-Page SEO Analysis', prompt: 'Evaluate the website\'s content quality, keyword strategy, and on-page SEO elements. Look for a blog, case studies, and the freshness of content. Identify opportunities for content marketing.' },
-            { value: 'User Experience (UX) & Accessibility', prompt: 'Assess the website\'s user experience (UX) and accessibility (WCAG compliance). Check for intuitive navigation, clear calls-to-action, and use of ARIA attributes. Note any potential friction points for users.' },
-            { value: 'Mobile Presence & App Strategy', prompt: "Investigate the company's mobile presence. Do they have a responsive website? Do they have a native mobile app on iOS or Android? If they have an app, check its user reviews and key features." }
+            { value: 'General Business SWOT Analysis', prompt: 'Perform a comprehensive SWOT (Strengths, Weaknesses, Opportunities, Threats) analysis of the company\'s overall business. Focus on market position, product/service offerings, and customer reviews. The results should be categorized and placed into the key strengths and weaknesses fields.' },
+            { value: 'Recent Company News & Events', prompt: "Find recent news, press releases, or blog posts. Look for announcements about expansion, new products, funding rounds, or leadership changes that could be used as a conversation starter. Summarize in 'customResearchResults'." },
+            { value: 'Key Competitor Analysis', prompt: 'Identify one or two key competitors and briefly analyze their strategy in comparison. Highlight areas where the target company is leading or lagging behind its competition in terms of products, marketing, or customer service.' },
+            { value: 'Hiring Trends & Company Culture', prompt: 'Analyze recent job postings to understand hiring trends, company growth, and the technologies or skills they are investing in. This can provide clues about their internal strategy and culture.' },
         ]
     },
     {
-        category: "Marketing & Sales Technology",
+        category: "Marketing & Sales Analysis",
         options: [
-            { value: 'Social Media & Digital Marketing Tech', prompt: "Analyze the company's social media presence (e.g., LinkedIn, Facebook, Instagram) and identify the marketing technology they might be using on their website (e.g., marketing automation pixels, analytics tools, CRM integrations)." },
-            { value: 'E-commerce Platform & Technology Stack', prompt: "If the company is an e-commerce business, identify the platform they are using (e.g., Shopify, Magento, WooCommerce) and any notable technologies or plugins for payments, shipping, or customer service." },
-            { value: 'Lead Generation & CRM Systems', prompt: "Look for clues about their sales and lead generation process. Check for specific CRM mentions (e.g., Salesforce, HubSpot) in job postings or website source code. Analyze their lead capture forms and processes." }
+            { value: 'Online Presence & Digital Marketing', prompt: "Analyze the company's website and social media presence (e.g., LinkedIn, Facebook, Instagram). Evaluate their content quality, SEO, and user experience. Identify their digital marketing strategy and any technologies used." },
+            { value: 'Customer Reviews & Reputation', prompt: "Analyze customer reviews on platforms like Google Maps, Yelp, or industry-specific sites. Summarize the company's public reputation, common praises, and frequent complaints." },
+            { value: 'Sales Channels & Lead Generation', prompt: "Investigate how the company sells its products or services. Do they have a physical store, an e-commerce website, or a direct sales team? Analyze their lead capture forms and processes." },
         ]
     },
     {
-        category: "Infrastructure & Security",
+        category: "Operations & Product/Service",
         options: [
-            { value: 'Cybersecurity Posture Assessment', prompt: "Perform a non-intrusive, a high-level assessment of the company's public cybersecurity posture. Check for SSL/TLS certificate validity, email security records (SPF, DMARC), and any publicly known vulnerabilities or data breaches." },
-            { value: 'Cloud Infrastructure & Service Adoption', prompt: "Investigate if there are public signs of cloud service adoption. Look for DNS records, job postings mentioning AWS, Azure, or Google Cloud, or technology stack information that points to specific cloud services." },
-            { value: 'Data & Analytics Capabilities', prompt: 'Look for evidence of their data and analytics capabilities. Check job postings for roles like "Data Analyst" or "Data Scientist". Identify any analytics tools (e.g., Google Analytics, Hotjar) embedded on their website.' }
+            { value: 'Product/Service Offering Analysis', prompt: 'Analyze their main products or services. What are the key features and pricing? How do they compare to competitors? What is their unique selling proposition?' },
+            { value: 'Supply Chain & Logistics', prompt: 'For companies dealing with physical goods, investigate their supply chain and logistics. Are there any mentions of suppliers, distribution centers, or shipping partners? Note any potential efficiencies or bottlenecks.' },
+            { value: 'Technology & Infrastructure (General)', prompt: "Investigate the company's general technology stack. For e-commerce, what platform do they use? For services, are there mentions of specific software they use for operations? This is a general, non-intrusive look." },
         ]
     },
     {
-        category: "Business & Strategy",
+        category: "Financial & Corporate Structure",
         options: [
-            { value: 'General Business SWOT Analysis', prompt: 'Perform a comprehensive SWOT (Strengths, Weaknesses, Opportunities, Threats) analysis of the company\'s overall business. Focus on market position, product/service offerings, and customer reviews. The results should be categorized and placed into keyStrengthsIT (as Strengths) and keyWeaknessesIT (as Weaknesses).' },
-            { value: 'General IT SWOT Analysis', prompt: 'Perform a comprehensive SWOT (Strengths, Weaknesses, Opportunities, Threats) analysis of the company\'s overall IT and digital presence. The results should be categorized and placed into keyStrengthsIT and keyWeaknessesIT.' },
-            { value: 'Hiring Trends & Technology Stack', prompt: 'Analyze recent job postings to understand hiring trends and the technologies they are investing in. This provides clues about their internal tech stack (e.g., programming languages, frameworks, databases).' },
-            { value: 'Recent Company News & Funding Events', prompt: "Find recent news, press releases, or blog posts. Look for announcements about expansion, new products, funding rounds, or leadership changes that could be used as a conversation starter. Summarize in 'customResearchResults'." },
-            { value: 'Key Competitor Digital Analysis', prompt: 'Identify one or two key competitors and briefly analyze their digital strategy in comparison. Highlight areas where the target company is leading or lagging behind its competition.' },
+            { value: 'Funding & Financial Health Indicators', prompt: "Look for public information about funding rounds, investors, or financial performance (if a public company). Note any signs of significant growth or financial distress." },
+            { value: 'Corporate Structure & Key People', prompt: 'Identify the key leadership team beyond just one contact person. Understand the corporate structure and look for recent changes in management.' },
         ]
     },
 ];
@@ -73,7 +70,7 @@ const getCookie = (name: string): string | null => {
 
 const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationStatus, generationProgress, t }) => {
   const [location, setLocation] = useState('Surabaya, Indonesia');
-  const [keywords, setKeywords] = useState('manufacturing');
+  const [keywords, setKeywords] = useState('Manufacturing');
   const [count, setCount] = useState(3);
   const [companyGrowthStage, setCompanyGrowthStage] = useState('Any');
 
