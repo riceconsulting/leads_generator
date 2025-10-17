@@ -34,7 +34,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenModal, savedLeadsCount, theme, to
                         RICE AI
                     </h1>
                     <p className="font-sans text-xs sm:text-sm text-accent-light dark:text-accent-dark tracking-wide opacity-90">
-                        Lead Generator
+                        Leads Generator
                     </p>
                 </div>
               </a>

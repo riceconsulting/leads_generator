@@ -387,7 +387,7 @@ const createValidationPrompt = (lead: BusinessLead): string => {
     const phonesString = (Array.isArray(contactPhone) ? contactPhone : []).join(', ');
 
     return `
-        You are a meticulous data validation AI. Your task is to rigorously verify if a given website URL is the correct, official website for a specific company.
+        You are a meticulous data validation AI. Your task is to rigorously verify if a given website URL is the correct, official website for a specific company. Your primary goal is accuracy.
 
         **Company to Verify:** "${businessName}"
         **Proposed Website:** "${officialWebsite}"
@@ -409,7 +409,7 @@ const createValidationPrompt = (lead: BusinessLead): string => {
         2.  \`correctedWebsite\`: A string.
             *   If \`isCorrect\` is \`true\`, this field MUST contain the original, validated website URL.
             *   If \`isCorrect\` is \`false\`, this field MUST contain the URL of the correct official website you found.
-            *   If you cannot find the correct website after a thorough search, return "Not Found" in this field.
+            *   **CRITICAL RULE**: If you cannot find a high-confidence match for the correct website after a thorough search, you MUST return "Not Found" in this field. **DO NOT guess or provide a low-confidence URL.**
 
         **Example Response 1 (Correct):**
         {
@@ -421,6 +421,12 @@ const createValidationPrompt = (lead: BusinessLead): string => {
         {
             "isCorrect": false,
             "correctedWebsite": "https://www.the-actual-official-site.com"
+        }
+        
+        **Example Response 3 (Incorrect and Not Found):**
+        {
+            "isCorrect": false,
+            "correctedWebsite": "Not Found"
         }
     `;
 };
@@ -498,44 +504,43 @@ export const generateLeads = async (
       progress: 10,
     });
     
-    // 2. Research each company sequentially to avoid rate limits and provide clear progress
-    const initialResults: (BusinessLead | null)[] = [];
-    for (let i = 0; i < companyNames.length; i++) {
-        const companyName = companyNames[i];
-        
-        const researchProgressStart = 10;
-        const researchProgressTotal = 80; // Research phase is from 10% to 90%
-        const progressPerLead = researchProgressTotal / companyNames.length;
-        const currentProgress = researchProgressStart + (i * progressPerLead);
-        
-        onProgressUpdate({
-            status: `Researching "${companyName}" (${i + 1}/${companyNames.length})...`,
-            progress: currentProgress,
-        });
+    // 2. Research each company in parallel to improve efficiency
+    const researchProgressStart = 10;
+    const researchProgressTotal = 80; // Research phase is from 10% to 90%
+    const progressPerLead = researchProgressTotal / companyNames.length;
+    let leadsResearched = 0;
+    
+    const researchPromises = companyNames.map((companyName, i) => (
+        // Add a staggered delay to avoid hitting rate limits too hard.
+        new Promise(resolve => setTimeout(resolve, i * 250)) 
+            .then(async () => {
+                try {
+                    const leadDetailPrompt = createLeadDetailPrompt(params, companyName);
+                    const leadData = await generateAndParseWithRetry({
+                        model: 'gemini-2.5-flash',
+                        contents: leadDetailPrompt,
+                        config: { tools: [{ googleSearch: {} }] },
+                    }, null, 2); // Use fewer retries here to fail faster on a single bad lead
+                    
+                    if (leadData.leads && leadData.leads.length > 0) {
+                        return leadData.leads[0] as BusinessLead;
+                    }
+                    return null; // AI returned empty leads array
+                } catch (e) {
+                    console.error(`Error researching "${companyName}" after retries:`, e);
+                    return null; // Mark as failed
+                } finally {
+                    // This block will run whether the try succeeds or fails.
+                    leadsResearched++;
+                    onProgressUpdate({
+                        status: `Researching... (${leadsResearched}/${companyNames.length} complete)`,
+                        progress: researchProgressStart + (leadsResearched * progressPerLead),
+                    });
+                }
+            })
+    ));
 
-        try {
-            const leadDetailPrompt = createLeadDetailPrompt(params, companyName);
-            const leadData = await generateAndParseWithRetry({
-                model: 'gemini-2.5-flash',
-                contents: leadDetailPrompt,
-                config: { tools: [{ googleSearch: {} }] },
-            }, null, 2); // Use fewer retries here to fail faster on a single bad lead
-            
-            if (leadData.leads && leadData.leads.length > 0) {
-                initialResults.push(leadData.leads[0] as BusinessLead);
-            } else {
-                initialResults.push(null); // AI returned empty leads array
-            }
-        } catch (e) {
-            console.error(`Error researching "${companyName}" after retries:`, e);
-            initialResults.push(null); // Mark as failed
-        }
-        
-        // Add a small delay between requests to be polite to the API
-        if (i < companyNames.length - 1) {
-            await new Promise(res => setTimeout(res, 500));
-        }
-    }
+    const initialResults = await Promise.all(researchPromises);
     
     const successfulLeads = initialResults.filter((lead): lead is BusinessLead => lead !== null);
     

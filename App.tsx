@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { BusinessLead, LeadGenerationParams } from './types';
 import { generateLeads } from './services/geminiService';
@@ -237,7 +238,9 @@ const App: React.FC = () => {
   const t = useCallback((key: keyof typeof translations.en, ...args: any[]) => {
     const translation = translations[language][key] || translations.en[key];
     if (typeof translation === 'function') {
-      return translation(...args);
+      // FIX: Use Function.prototype.apply to prevent TypeScript error about spreading a non-tuple array.
+      // This is a more robust way to call a function with a dynamic list of arguments.
+      return translation.apply(null, args);
     }
     return translation as string;
   }, [language]);
