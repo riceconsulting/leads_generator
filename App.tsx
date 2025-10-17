@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { BusinessLead, LeadGenerationParams } from './types';
 import { generateLeads } from './services/geminiService';
-import { addLead, getLeads, clearLeads as dbClearLeads } from './services/database';
+import { getLeads, clearLeads as dbClearLeads, batchAddLeads } from './services/database';
 import Header from './components/Header';
 import LeadForm from './components/LeadForm';
 import ResultsDisplay from './components/ResultsDisplay';
@@ -278,12 +278,14 @@ const App: React.FC = () => {
   
   const handleSaveAllLeads = useCallback(async (leadsToSave: BusinessLead[]) => {
     try {
-        for (const lead of leadsToSave) {
+        const leadsWithIds = leadsToSave.map(lead => {
             if (!lead.id) {
-                lead.id = `${lead.businessName}-${lead.officialWebsite}`;
+                // Ensure ID is created consistently and is unique
+                lead.id = `${lead.businessName}-${lead.officialWebsite || Date.now()}`;
             }
-            await addLead(lead);
-        }
+            return lead;
+        });
+        await batchAddLeads(leadsWithIds);
     } catch(e) {
         console.error("Error batch saving leads", e);
     } finally {
@@ -375,12 +377,14 @@ const App: React.FC = () => {
   
   const handleImportLeads = useCallback(async (importedLeads: BusinessLead[]) => {
     try {
-        for (const lead of importedLeads) {
+        const leadsWithIds = importedLeads.map(lead => {
+            // The import logic already creates a unique ID, but we ensure it here
             if (!lead.id) {
-                lead.id = `${lead.businessName}-${lead.officialWebsite}`;
+                lead.id = `${lead.businessName}-${lead.officialWebsite || Date.now()}`;
             }
-            await addLead(lead);
-        }
+            return lead;
+        });
+        await batchAddLeads(leadsWithIds);
     } catch(e) {
         console.error("Error importing leads", e);
     } finally {

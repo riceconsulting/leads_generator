@@ -40,6 +40,18 @@ export const addLead = async (lead: BusinessLead) => {
   await db.put(LEADS_STORE_NAME, lead);
 };
 
+/**
+ * Adds multiple leads to the database in a single transaction for efficiency.
+ */
+export const batchAddLeads = async (leads: BusinessLead[]) => {
+  if (leads.length === 0) return;
+  const db = await initDB();
+  const tx = db.transaction(LEADS_STORE_NAME, 'readwrite');
+  const promises = leads.map(lead => tx.store.put(lead));
+  promises.push(tx.done);
+  await Promise.all(promises);
+};
+
 export const getLeads = async (): Promise<BusinessLead[]> => {
   const db = await initDB();
   return db.getAll(LEADS_STORE_NAME);

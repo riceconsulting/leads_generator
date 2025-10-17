@@ -378,68 +378,68 @@ The service/product we are offering to the target company is: "${serviceDescript
 
 
 /**
- * PROMPT 3: Generates a prompt to validate a company's website.
+ * PROMPT 3: Generates a prompt to validate a company's entire contact profile.
  */
 const createValidationPrompt = (lead: BusinessLead): string => {
-    const { businessName, officialWebsite, contactEmail, contactPhone } = lead;
+    const { businessName, officialWebsite, contactEmail, contactPhone, contactWhatsApp, instagramHandle } = lead;
 
     const emailsString = (Array.isArray(contactEmail) ? contactEmail : []).join(', ');
     const phonesString = (Array.isArray(contactPhone) ? contactPhone : []).join(', ');
 
     return `
-        You are a meticulous data validation AI. Your task is to rigorously verify if a given website URL is the correct, official website for a specific company. Your primary goal is accuracy.
+        You are a meticulous data validation AI. Your task is to rigorously verify the entire contact profile for a company based on the initial information provided. Your goal is absolute accuracy. Do not invent or hallucinate information.
 
-        **Company to Verify:** "${businessName}"
-        **Proposed Website:** "${officialWebsite}"
-        **Known Contact Emails:** "${emailsString || 'None'}"
-        **Known Contact Phones:** "${phonesString || 'None'}"
+        **Company Profile to Verify:**
+        - **Name:** "${businessName}"
+        - **Proposed Website:** "${officialWebsite}"
+        - **Proposed Emails:** "${emailsString || 'None'}"
+        - **Proposed Phones:** "${phonesString || 'None'}"
+        - **Proposed WhatsApp:** "${contactWhatsApp || 'None'}"
+        - **Proposed Instagram:** "${instagramHandle || 'None'}"
 
-        **Verification Protocol:**
-        1.  **Initial Scan**: Access the proposed website and look for the company name in the title, footer, or "About Us" page. A direct match is a strong indicator.
-        2.  **Contact Info Cross-Reference**:
-            *   **Email Domain Match**: This is a CRITICAL check. Does the domain of any known contact emails (@domain.com) match the domain of the proposed website? This is the strongest evidence.
-            *   **Phone Number Match**: Are any of the known contact phone numbers listed on the website?
-        3.  **Search Engine Triangulation**: Use Google Search with queries like \`"${businessName}" official site\`. Compare the top results with the proposed website.
-        4.  **Negative Indicators**: The website is likely INCORRECT if it is a social media profile (Facebook, Instagram), a general business directory (e.g., Yellow Pages), a news article, or a blog post.
-        5.  **Correction**: If the proposed website is incorrect, you MUST perform a new search to find the correct official website.
-        
+        **Verification & Correction Protocol:**
+
+        **Step 1: Website Verification (Highest Priority)**
+        - First, determine if the "Proposed Website" is the correct, official, operational website.
+        - Use Google Search like \`"${businessName}" official site\` to triangulate.
+        - The correct website is the single source of truth for the next steps. It CANNOT be a directory, social media page, or marketplace.
+        - **If the website is incorrect, you MUST find the correct one before proceeding.**
+
+        **Step 2: Contact Information Audit (Using the Verified Website)**
+        - Scour the *verified* official website (from Step 1) for all contact details.
+        - **Emails**: Does the website list the "Proposed Emails"? If not, find the primary contact emails listed on the site (e.g., on the 'Contact Us' page). Prioritize emails like info@, contact@, sales@.
+        - **Phones**: Does the website list the "Proposed Phones"? If not, find the primary phone numbers on the site.
+        - **WhatsApp**: Is there a number on the website explicitly marked for WhatsApp? If so, use that.
+        - **Instagram**: Is there a link to an official Instagram page on the website? The handle must match. If there is a link, use the handle it points to.
+
         **Output Requirement:**
-        Your entire response MUST be a single JSON object with two keys. Do not add any other text.
-        1.  \`isCorrect\`: A boolean value (\`true\` or \`false\`).
-        2.  \`correctedWebsite\`: A string.
-            *   If \`isCorrect\` is \`true\`, this field MUST contain the original, validated website URL.
-            *   If \`isCorrect\` is \`false\`, this field MUST contain the URL of the correct official website you found.
-            *   **CRITICAL RULE**: If you cannot find a high-confidence match for the correct website after a thorough search, you MUST return "Not Found" in this field. **DO NOT guess or provide a low-confidence URL.**
+        Your entire response MUST be a single JSON object. Do not add any other text.
+        - You must return a corrected version of the verified information.
+        - **CRITICAL RULE**: If you cannot find a high-confidence correction for a specific field, you MUST return the original value for that field. If the original value was empty or 'Not Found', and you cannot find a correct one, return an empty array [] for emails/phones or "Not Found" for strings.
+        - **ABSOLUTELY DO NOT INVENT OR HALLUCINATE data.** If it's not on the official website or a highly reliable source linked directly from it, it is not verified.
 
-        **Example Response 1 (Correct):**
+        **JSON Structure:**
+        \`\`\`json
         {
-            "isCorrect": true,
-            "correctedWebsite": "https://www.the-original-site.com"
+          "correctedWebsite": "string",
+          "correctedEmails": ["string"],
+          "correctedPhones": ["string"],
+          "correctedWhatsApp": "string",
+          "correctedInstagram": "string"
         }
-
-        **Example Response 2 (Incorrect and Corrected):**
-        {
-            "isCorrect": false,
-            "correctedWebsite": "https://www.the-actual-official-site.com"
-        }
-        
-        **Example Response 3 (Incorrect and Not Found):**
-        {
-            "isCorrect": false,
-            "correctedWebsite": "Not Found"
-        }
+        \`\`\`
     `;
 };
 
+
 /**
- * A helper function to validate a single lead's website.
+ * A helper function to validate a single lead's profile.
  */
 const validateLead = async (lead: BusinessLead): Promise<BusinessLead> => {
-    const hasWebsite = lead.officialWebsite && lead.officialWebsite.toLowerCase() !== 'not found';
-    const hasContactInfo = (lead.contactEmail && lead.contactEmail.length > 0) || (lead.contactPhone && lead.contactPhone.length > 0);
-
-    if (!hasWebsite || !hasContactInfo) {
-        return lead; // Skip validation if there's no website or contact info to cross-reference
+    // Only validate if there's a website to use as a source of truth.
+    if (!lead.officialWebsite || lead.officialWebsite.toLowerCase() === 'not found') {
+        console.log(`Skipping validation for "${lead.businessName}" due to no website.`);
+        return lead;
     }
 
     try {
@@ -452,15 +452,29 @@ const validateLead = async (lead: BusinessLead): Promise<BusinessLead> => {
             },
         }, null, 2); // 2 retries, no progress update
 
-        if (typeof validationData.isCorrect === 'boolean' && !validationData.isCorrect && validationData.correctedWebsite && validationData.correctedWebsite.toLowerCase() !== 'not found') {
-            console.log(`Website validation: Correcting URL for "${lead.businessName}" from ${lead.officialWebsite} to ${validationData.correctedWebsite}`);
-            return { ...lead, officialWebsite: validationData.correctedWebsite };
+        const updatedLead = { ...lead };
+
+        if (validationData.correctedWebsite && validationData.correctedWebsite.toLowerCase() !== 'not found') {
+            updatedLead.officialWebsite = validationData.correctedWebsite;
+        }
+        if (Array.isArray(validationData.correctedEmails)) {
+            updatedLead.contactEmail = validationData.correctedEmails;
+        }
+        if (Array.isArray(validationData.correctedPhones)) {
+            updatedLead.contactPhone = validationData.correctedPhones;
+        }
+        if (typeof validationData.correctedWhatsApp === 'string') {
+            updatedLead.contactWhatsApp = validationData.correctedWhatsApp;
+        }
+        if (typeof validationData.correctedInstagram === 'string') {
+            updatedLead.instagramHandle = validationData.correctedInstagram;
         }
         
-        console.log(`Website validation: URL "${lead.officialWebsite}" confirmed for "${lead.businessName}".`);
-        return lead;
+        console.log(`Lead validation complete for "${lead.businessName}".`);
+        return updatedLead;
+
     } catch (e) {
-        console.error(`Could not validate website for "${lead.businessName}", returning original data. Error:`, e);
+        console.error(`Could not validate profile for "${lead.businessName}", returning original data. Error:`, e);
         return lead; // On error, just return the original lead without modification
     }
 };
@@ -504,17 +518,24 @@ export const generateLeads = async (
       progress: 10,
     });
     
-    // 2. Research each company in parallel to improve efficiency
-    const researchProgressStart = 10;
-    const researchProgressTotal = 80; // Research phase is from 10% to 90%
-    const progressPerLead = researchProgressTotal / companyNames.length;
-    let leadsResearched = 0;
+    // 2 & 3. Research and Validate each company in parallel for maximum efficiency
+    const progressStart = 10;
+    const progressTotal = 85; // Research & Validation phase is from 10% to 95%
+    const progressPerLead = progressTotal / companyNames.length;
+    let leadsProcessed = 0;
     
-    const researchPromises = companyNames.map((companyName, i) => (
+    const leadProcessingPromises = companyNames.map((companyName, i) => (
         // Add a staggered delay to avoid hitting rate limits too hard.
-        new Promise(resolve => setTimeout(resolve, i * 250)) 
+        new Promise<BusinessLead | null>(resolve => setTimeout(resolve, i * 250))
             .then(async () => {
+                let currentLead: BusinessLead | null = null;
                 try {
+                    // --- Research Step ---
+                    onProgressUpdate({
+                        status: `Researching "${companyName}"... (${leadsProcessed + 1}/${companyNames.length})`,
+                        progress: progressStart + (leadsProcessed * progressPerLead),
+                    });
+
                     const leadDetailPrompt = createLeadDetailPrompt(params, companyName);
                     const leadData = await generateAndParseWithRetry({
                         model: 'gemini-2.5-flash',
@@ -522,39 +543,45 @@ export const generateLeads = async (
                         config: { tools: [{ googleSearch: {} }] },
                     }, null, 2); // Use fewer retries here to fail faster on a single bad lead
                     
-                    if (leadData.leads && leadData.leads.length > 0) {
-                        return leadData.leads[0] as BusinessLead;
+                    if (!leadData.leads || leadData.leads.length === 0) {
+                        console.warn(`No lead data returned for "${companyName}".`);
+                        return null; // AI returned empty leads array
                     }
-                    return null; // AI returned empty leads array
+                    currentLead = leadData.leads[0] as BusinessLead;
+                    
+                    // --- Validation Step (interleaved for efficiency) ---
+                    onProgressUpdate({
+                        status: `Verifying data for "${companyName}"...`,
+                        // Set progress to the halfway point for this lead's slice of progress
+                        progress: progressStart + (leadsProcessed * progressPerLead) + (progressPerLead / 2),
+                    });
+
+                    const validatedLead = await validateLead(currentLead);
+                    return validatedLead;
+
                 } catch (e) {
-                    console.error(`Error researching "${companyName}" after retries:`, e);
+                    console.error(`Error researching or validating "${companyName}" after retries:`, e);
                     return null; // Mark as failed
                 } finally {
                     // This block will run whether the try succeeds or fails.
-                    leadsResearched++;
+                    leadsProcessed++;
                     onProgressUpdate({
-                        status: `Researching... (${leadsResearched}/${companyNames.length} complete)`,
-                        progress: researchProgressStart + (leadsResearched * progressPerLead),
+                        status: `Processed ${leadsProcessed}/${companyNames.length} leads.`,
+                        progress: progressStart + (leadsProcessed * progressPerLead),
                     });
                 }
             })
     ));
 
-    const initialResults = await Promise.all(researchPromises);
+    const results = await Promise.all(leadProcessingPromises);
+    const finalLeads = results.filter((lead): lead is BusinessLead => lead !== null);
     
-    const successfulLeads = initialResults.filter((lead): lead is BusinessLead => lead !== null);
-    
-    if (companyNames.length > 0 && successfulLeads.length === 0) {
+    if (companyNames.length > 0 && finalLeads.length === 0) {
         throw new Error("There was a problem on our end researching the businesses. The AI service may be temporarily unavailable. Please try again later.");
     }
     
-    // 3. Validate each lead's website
-    onProgressUpdate({ status: `Verifying websites for ${successfulLeads.length} leads...`, progress: 90 });
-    const validationPromises = successfulLeads.map(validateLead);
-    const validatedLeads = await Promise.all(validationPromises);
-
     onProgressUpdate({ status: 'Compiling your personalized lead reports...', progress: 100 });
     await new Promise(resolve => setTimeout(resolve, 500)); // Short pause for UX
 
-    return validatedLeads;
+    return finalLeads;
 };
