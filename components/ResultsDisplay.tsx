@@ -101,12 +101,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                                 <span className="text-xs text-text-secondary-light dark:text-text-secondary-dark">{lead.location}</span>
                             </div>
                             <h4 className="font-semibold text-sm text-text-primary-light dark:text-text-primary-dark">{lead.name}</h4>
-                            <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-xs">
                                 <div><span className="text-text-secondary-light dark:text-text-secondary-dark">Phone:</span> {lead.phone}</div>
                                 <div><span className="text-text-secondary-light dark:text-text-secondary-dark">Rating:</span> ⭐ {lead.rating}</div>
                             </div>
                             <div className="mt-2 p-2 bg-surface-light dark:bg-surface-dark rounded border border-border-light dark:border-border-dark">
-                                <div className="grid grid-cols-2 gap-1 text-xs">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
                                     <div><span className="text-green-600 dark:text-green-400">S:</span> {lead.swot.s}</div>
                                     <div><span className="text-red-600 dark:text-red-400">W:</span> {lead.swot.w}</div>
                                     <div><span className="text-blue-600 dark:text-blue-400">O:</span> {lead.swot.o}</div>
