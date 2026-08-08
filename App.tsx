@@ -329,7 +329,6 @@ const App: React.FC = () => {
         generatedLeadsCount: results.length
       };
       
-      // console.log("Attempting to send data to API endpoint /api/logToSheet", logData);
       
       fetch('/api/logToSheet', {
         method: 'POST',
@@ -344,7 +343,6 @@ const App: React.FC = () => {
           return response.json();
       })
       .then(data => {
-          // console.log("Successfully logged to sheet:", data.message);
       })
       .catch(err => {
         console.error("Failed to write to audit log sheet:", err);

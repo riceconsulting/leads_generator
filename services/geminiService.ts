@@ -166,7 +166,6 @@ const generateAndParseWithRetry = async (
                     });
                 }
                 const delay = 1000 * Math.pow(2, i); // Exponential backoff: 1s, 2s, 4s...
-                // console.log(`Retrying in ${delay / 1000}s...`);
                 await new Promise(res => setTimeout(res, delay));
             }
         }
@@ -438,7 +437,6 @@ const createValidationPrompt = (lead: BusinessLead): string => {
 const validateLead = async (lead: BusinessLead): Promise<BusinessLead> => {
     // Only validate if there's a website to use as a source of truth.
     if (!lead.officialWebsite || lead.officialWebsite.toLowerCase() === 'not found') {
-        // console.log(`Skipping validation for "${lead.businessName}" due to no website.`);
         return lead;
     }
 
@@ -470,7 +468,6 @@ const validateLead = async (lead: BusinessLead): Promise<BusinessLead> => {
             updatedLead.instagramHandle = validationData.correctedInstagram;
         }
         
-        // console.log(`Lead validation complete for "${lead.businessName}".`);
         return updatedLead;
 
     } catch (e) {

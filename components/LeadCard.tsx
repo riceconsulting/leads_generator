@@ -102,7 +102,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, t }) => {
                 {hasStrengths && (
                     <div>
                         <h5 className="font-heading font-semibold text-text-primary-light dark:text-text-primary-dark mb-2 flex items-center">
-                            <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
+                            <CheckCircleIcon className="h-5 w-5 text-success-light dark:text-success-dark mr-2" />
                             Positive Findings
                         </h5>
                         <ul className="list-disc list-inside space-y-1 text-sm text-text-secondary-light dark:text-text-secondary-dark">
@@ -146,7 +146,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, t }) => {
             >
                 {isSaved ? (
                     <>
-                        <CheckCircleIcon className="h-4 w-4 mr-2 text-green-500" />
+                        <CheckCircleIcon className="h-4 w-4 mr-2 text-success-light dark:text-success-dark" />
                         <span className="text-text-primary-light dark:text-text-primary-dark">{t('saved')}</span>
                     </>
                 ) : (

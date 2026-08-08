@@ -169,7 +169,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
   
   const primaryButtonStyles = "flex items-center justify-center px-4 py-2 bg-primary-light hover:brightness-95 dark:bg-primary-dark dark:hover:brightness-95 text-white text-sm font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light dark:focus:ring-offset-surface-dark dark:focus:ring-primary-dark disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors duration-200";
   const secondaryButtonStyles = "flex items-center justify-center px-4 py-2 border border-primary-light dark:border-primary-dark text-primary-dark dark:text-primary-light text-sm font-semibold rounded-lg shadow-sm hover:bg-background-light dark:hover:bg-border-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light dark:focus:ring-offset-surface-dark dark:focus:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200";
-  const destructiveButtonStyles = "flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-surface-dark disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors duration-200";
+  const destructiveButtonStyles = "flex items-center justify-center px-4 py-2 bg-error-light dark:bg-error-dark hover:bg-error-light dark:hover:bg-error-dark text-white text-sm font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-surface-dark disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed transition-colors duration-200";
 
 
   return (
@@ -185,8 +185,8 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
         <div className="fixed inset-0 bg-black bg-opacity-70 z-[60] flex justify-center items-center p-4" onClick={() => setShowConfirmClear(false)}>
             <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
                 <div className="text-center">
-                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30">
-                        <AlertTriangleIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
+                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-error-light dark:bg-error-dark">
+                        <AlertTriangleIcon className="h-6 w-6 text-error-light dark:text-error-dark" />
                     </div>
                     <h3 className="mt-4 text-lg font-semibold text-text-primary-light dark:text-text-primary-dark">
                         {t('deleteAllLeadsTitle')}
@@ -208,7 +208,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                     <button
                         type="button"
                         onClick={handleConfirmClear}
-                        className="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-600 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                        className="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-error-light dark:bg-error-dark text-base font-medium text-white shadow-sm hover:bg-error-light dark:hover:bg-error-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                     >
                         {t('deleteAll')}
                     </button>
@@ -240,7 +240,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
                         className="w-full h-64 p-3 font-mono text-sm bg-background-light dark:bg-border-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:outline-none focus:ring-primary-light focus:border-primary-light dark:focus:ring-primary-dark dark:focus:border-primary-dark"
                     />
                     {importError && (
-                         <div className="mt-4 bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm" role="alert">
+                         <div className="mt-4 bg-error-light dark:bg-error-dark border border-error-light dark:border-error-dark text-error-light dark:text-error-dark px-4 py-3 rounded-lg text-sm" role="alert">
                             <strong className="font-bold">Import Error:</strong>
                             <span className="block sm:inline ml-2">{importError}</span>
                         </div>

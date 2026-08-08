@@ -29,7 +29,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   if (error) {
     return (
-      <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg relative mb-24" role="alert">
+      <div className="bg-error-light dark:bg-error-dark border border-error-light dark:border-error-dark text-error-light dark:text-error-dark px-4 py-3 rounded-lg relative mb-24" role="alert">
         <strong className="font-bold flex items-center">
             <AlertTriangleIcon className="h-5 w-5 mr-2" />
             {t('error')}
