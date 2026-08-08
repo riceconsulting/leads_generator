@@ -88,7 +88,7 @@ const generateContentWithRetry = async (
 
         // A non-blocking response might still be empty. The calling function will handle this.
         if (!response.text) {
-             console.warn("AI returned a response with no text content. This will trigger a retry. Full response:", JSON.stringify(response, null, 2));
+             // console.warn("AI returned a response with no text content. This will trigger a retry. Full response:", JSON.stringify(response, null, 2));
         }
 
         return response;
@@ -111,7 +111,7 @@ const generateContentWithRetry = async (
             e.code === 6;
 
         if (retries > 0 && isServerError) {
-            console.warn(`Request failed with transient error, retrying in ${delay / 1000}s... (${retries} retries left)`);
+            // console.warn(`Request failed with transient error, retrying in ${delay / 1000}s... (${retries} retries left)`);
             await new Promise(res => setTimeout(res, delay));
             return generateContentWithRetry(request, retries - 1, delay * 2); // Exponential backoff
         }
@@ -156,7 +156,7 @@ const generateAndParseWithRetry = async (
             return parsed; // Success!
         } catch (e: any) {
             lastError = e;
-            console.warn(`Attempt ${i + 1}/${retries} failed. Reason: ${e.message}`);
+            // console.warn(`Attempt ${i + 1}/${retries} failed. Reason: ${e.message}`);
             
             if (i < retries - 1) {
                 if (onProgressUpdate) {
@@ -541,7 +541,7 @@ export const generateLeads = async (
                     }, null, 2); // Use fewer retries here to fail faster on a single bad lead
                     
                     if (!leadData.leads || leadData.leads.length === 0) {
-                        console.warn(`No lead data returned for "${companyName}".`);
+                        // console.warn(`No lead data returned for "${companyName}".`);
                         return null; // AI returned empty leads array
                     }
                     currentLead = leadData.leads[0] as BusinessLead;

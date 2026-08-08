@@ -113,7 +113,7 @@ const LeadCard: React.FC<LeadCardProps> = ({ lead, isSaved, t }) => {
                 {hasWeaknesses && (
                        <div>
                         <h5 className="font-heading font-semibold text-text-primary-light dark:text-text-primary-dark mb-2 flex items-center">
-                            <XCircleIcon className="h-5 w-5 text-yellow-500 mr-2" />
+                            <XCircleIcon className="h-5 w-5 text-warning-light dark:text-warning-dark mr-2" />
                             Opportunities for Improvement
                         </h5>
                         <ul className="list-disc list-inside space-y-1 text-sm text-text-secondary-light dark:text-text-secondary-dark">
