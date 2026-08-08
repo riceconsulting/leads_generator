@@ -293,12 +293,12 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
           </div>
 
           <div>
-              <label htmlFor="emailTemplate" className={formLabelStyle}>{t('emailMessageTemplate')} <span className="text-slate-400">({t('optional')})</span></label>
+              <label htmlFor="emailTemplate" className={formLabelStyle}>{t('emailMessageTemplate')} <span className="text-text-secondary-light dark:text-text-secondary-dark">({t('optional')})</span></label>
               <textarea id="emailTemplate" value={emailTemplate} onChange={(e) => setEmailTemplate(e.target.value)} className={formInputStyle} rows={4} placeholder="e.g., Hi {{contactPerson.name}}, I saw that {{businessName}} might need help with {{keyWeaknessesIT[0]}}. Let's connect."></textarea>
               <p className={formDescriptionStyle}>{t('emailTemplatePlaceholder')}</p>
           </div>
           <div>
-              <label htmlFor="whatsappTemplate" className={formLabelStyle}>{t('whatsappMessageTemplate')} <span className="text-slate-400">({t('optional')})</span></label>
+              <label htmlFor="whatsappTemplate" className={formLabelStyle}>{t('whatsappMessageTemplate')} <span className="text-text-secondary-light dark:text-text-secondary-dark">({t('optional')})</span></label>
               <textarea id="whatsappTemplate" value={whatsappTemplate} onChange={(e) => setWhatsappTemplate(e.target.value)} className={formInputStyle} rows={2} placeholder="e.g., Hi {{contactPerson.name}}, I saw an opportunity to improve the website for {{businessName}}. Quick chat?"></textarea>
                 <p className={formDescriptionStyle}>{t('whatsappTemplatePlaceholder')}</p>
           </div>
