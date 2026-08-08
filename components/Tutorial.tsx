@@ -91,7 +91,7 @@ const Tutorial: React.FC<TutorialProps> = ({ onFinish, onStartDummyLeadGeneratio
         // Apply highlight styles directly to the element
         targetElement.style.zIndex = '1001';
         targetElement.style.position = 'relative';
-        targetElement.style.boxShadow = '0 0 0 4px rgba(98, 155, 188, 0.7)';
+        targetElement.style.boxShadow = '0 0 0 4px var(--color-primary-light)';
         targetElement.style.borderRadius = '6px';
         targetElement.style.transition = 'box-shadow 0.3s ease-in-out';
         
