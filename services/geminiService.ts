@@ -443,7 +443,7 @@ const validateLead = async (lead: BusinessLead): Promise<BusinessLead> => {
     try {
         const validationPrompt = createValidationPrompt(lead);
         const validationData = await generateAndParseWithRetry({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3.6-flash',
             contents: validationPrompt,
             config: {
                 tools: [{ googleSearch: {} }]
@@ -490,7 +490,7 @@ export const generateLeads = async (
     try {
         companyData = await generateAndParseWithRetry(
             {
-                model: 'gemini-2.5-flash',
+                model: 'gemini-3.6-flash',
                 contents: companyListPrompt,
                 config: { tools: [{ googleSearch: {} }] },
             },
@@ -535,7 +535,7 @@ export const generateLeads = async (
 
                     const leadDetailPrompt = createLeadDetailPrompt(params, companyName);
                     const leadData = await generateAndParseWithRetry({
-                        model: 'gemini-2.5-flash',
+                        model: 'gemini-3.6-flash',
                         contents: leadDetailPrompt,
                         config: { tools: [{ googleSearch: {} }] },
                     }, null, 2); // Use fewer retries here to fail faster on a single bad lead
