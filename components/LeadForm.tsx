@@ -105,7 +105,6 @@ const LeadForm: React.FC<LeadFormProps> = ({ onGenerate, isLoading, generationSt
     e.preventDefault();
     
     if (generationCount >= RATE_LIMIT) {
-        alert("You have reached your daily generation limit of 10. Please try again tomorrow.");
         return;
     }
 

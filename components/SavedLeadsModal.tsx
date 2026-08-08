@@ -118,10 +118,6 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
       console.error("Import failed:", e);
       const errorMessage = e.message || 'An unexpected error occurred during import.';
       setImportError(errorMessage);
-       // For file import, a simple alert is sufficient. For text import, the error is shown inline.
-      if (!isTextImportOpen) {
-        alert(`Import Error: ${errorMessage}`);
-      }
     } finally {
       setIsImporting(false);
     }
@@ -138,7 +134,6 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
       reader.onerror = () => {
         const errorMessage = "Failed to read the file.";
         setImportError(errorMessage);
-        alert(`Import Error: ${errorMessage}`);
       }
       reader.readAsText(file);
     }
@@ -283,6 +278,13 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
           </div>
           
           <main className="flex-grow p-2 sm:p-4 overflow-y-auto">
+            {importError && !isTextImportOpen && (
+              <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm" role="alert">
+                <strong className="font-bold">Import Error:</strong>
+                <span className="block sm:inline ml-2">{importError}</span>
+                <button onClick={() => setImportError(null)} className="float-right font-bold hover:text-red-900 dark:hover:text-red-200">×</button>
+              </div>
+            )}
             <div className="overflow-x-auto">
               {leads.length === 0 ? (
                 <div className="text-center py-20 px-6">
