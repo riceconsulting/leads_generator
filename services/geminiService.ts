@@ -1,3 +1,5 @@
+const MODEL_NAME = "gemini-3.6-flash";
+
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { BusinessLead, LeadGenerationParams } from '../types';
 
@@ -443,7 +445,7 @@ const validateLead = async (lead: BusinessLead): Promise<BusinessLead> => {
     try {
         const validationPrompt = createValidationPrompt(lead);
         const validationData = await generateAndParseWithRetry({
-            model: 'gemini-3.6-flash',
+            model: MODEL_NAME,
             contents: validationPrompt,
             config: {
                 tools: [{ googleSearch: {} }]
@@ -490,7 +492,7 @@ export const generateLeads = async (
     try {
         companyData = await generateAndParseWithRetry(
             {
-                model: 'gemini-3.6-flash',
+                model: MODEL_NAME,
                 contents: companyListPrompt,
                 config: { tools: [{ googleSearch: {} }] },
             },
@@ -535,7 +537,7 @@ export const generateLeads = async (
 
                     const leadDetailPrompt = createLeadDetailPrompt(params, companyName);
                     const leadData = await generateAndParseWithRetry({
-                        model: 'gemini-3.6-flash',
+                        model: MODEL_NAME,
                         contents: leadDetailPrompt,
                         config: { tools: [{ googleSearch: {} }] },
                     }, null, 2); // Use fewer retries here to fail faster on a single bad lead
