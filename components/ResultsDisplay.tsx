@@ -53,13 +53,42 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <SampleOutput
                 title="Sample Output: Lead Generation"
                 description="Here's an example of the leads the generator can create for you."
-                sampleData={[
-                    {
-                        label: 'Generated Lead: Warung Makan Berkah',
-                        content: `🏢 **Business Information**\n• Company Name: Warung Makan Berkah\n• Address: Jl. Sudirman No. 123, Jakarta Pusat\n• Phone: +62 21 555-0123\n• Website: www.warungberkah.com\n• Email: info@warungberkah.com\n\n📊 **Business Profile**\n• Industry: Restaurant & Food Service\n• Company Size: Small (1-10 employees)\n• Founded: 2018\n• Specialty: Traditional Indonesian cuisine\n\n⭐ **Online Presence**\n• Google Maps Rating: 4.5/5 (128 reviews)\n• Instagram: @warungberkah (2.3K followers)\n\n🎯 **SWOT Analysis**\nStrengths: Strong local reputation, prime location\nWeaknesses: Limited online ordering, minimal digital presence\nOpportunities: Growing delivery demand, social media potential\nThreats: Increasing competition, rising costs\n\n✉️ **Personalized Outreach**\nSubject: Help Warung Berkah Reach More Customers\n\nHi [Owner Name],\n\nI noticed Warung Berkah has excellent reviews on Google Maps (4.5 stars!) but limited online presence. Many similar restaurants in Jakarta have increased their orders by 40% through delivery platform integration.\n\nWould you be open to a quick chat?`
-                    }
-                ]}
-            />
+            >
+                <div className="bg-background-light dark:bg-background-dark rounded-lg p-4 border border-border-light dark:border-border-dark">
+                    <div className="flex items-center gap-2 mb-3">
+                        <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium rounded">Restaurant</span>
+                        <span className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Jakarta, Indonesia</span>
+                    </div>
+                    <h4 className="font-semibold text-text-primary-light dark:text-text-primary-dark">Warung Makan Berkah</h4>
+                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">Jl. Sudirman No. 123, Jakarta Pusat</p>
+                    
+                    <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
+                        <div>
+                            <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Phone</p>
+                            <p className="text-text-primary-light dark:text-text-primary-dark">+62 21 555-0123</p>
+                        </div>
+                        <div>
+                            <p className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Rating</p>
+                            <p className="text-text-primary-light dark:text-text-primary-dark">⭐ 4.5/5 (128 reviews)</p>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-3 p-2 bg-surface-light dark:bg-surface-dark rounded border border-border-light dark:border-border-dark">
+                        <p className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">SWOT Analysis</p>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div><span className="text-green-600 dark:text-green-400">S:</span> Strong local reputation</div>
+                            <div><span className="text-red-600 dark:text-red-400">W:</span> Limited online ordering</div>
+                            <div><span className="text-blue-600 dark:text-blue-400">O:</span> Growing delivery demand</div>
+                            <div><span className="text-amber-600 dark:text-amber-400">T:</span> Increasing competition</div>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-3 p-2 bg-primary-light/10 dark:bg-primary-dark/10 rounded border border-primary-light/20 dark:border-primary-dark/20">
+                        <p className="text-xs font-medium text-primary-light dark:text-primary-dark mb-1">✉️ Outreach Message</p>
+                        <p className="text-xs text-text-primary-light dark:text-text-primary-dark">Hi [Owner Name], I noticed Warung Berkah has excellent reviews but limited online presence. Many similar restaurants have increased orders by 40% through delivery platform integration. Would you be open to a quick chat?</p>
+                    </div>
+                </div>
+            </SampleOutput>
         </div>
     );
   }
