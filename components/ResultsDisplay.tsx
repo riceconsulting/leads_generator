@@ -42,14 +42,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   if (leads.length === 0) {
     return (
-        <div className="flex flex-col items-center justify-center py-10 px-6 bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg mb-24 gap-6">
-            <div className="text-center">
-                <InfoIcon className="mx-auto h-12 w-12 text-text-secondary-dark" />
-                <h3 className="mt-2 text-lg font-medium text-text-primary-light dark:text-text-primary-dark">{t('readyToStart')}</h3>
-                <p className="mt-1 text-sm text-text-secondary-light dark:text-text-secondary-dark">
-                    {t('readyToStartDescription')}
-                </p>
-            </div>
+        <div className="mb-24">
             <SampleOutput
                 title="Sample Output: 5 Leads Generated"
                 description="Here's an example of the leads the generator can create for you."
