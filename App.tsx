@@ -8,6 +8,7 @@ import LeadForm from './components/LeadForm';
 import ResultsDisplay from './components/ResultsDisplay';
 import SavedLeadsModal from './components/SavedLeadsModal';
 import Footer from './components/Footer';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const translations = {
   en: {
@@ -401,6 +402,7 @@ const App: React.FC = () => {
   };
 
   return (
+    <ErrorBoundary>
     <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark transition-colors duration-300">
       <Header 
         onOpenModal={openModal} 
@@ -450,6 +452,7 @@ const App: React.FC = () => {
       
       <Footer t={t} />
     </div>
+    </ErrorBoundary>
   );
 };
 
