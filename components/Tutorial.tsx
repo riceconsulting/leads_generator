@@ -1,3 +1,6 @@
+const Z_INDEX_OVERLAY = 1000;
+const Z_INDEX_TOOLTIP = 1002;
+
 import React, { useState, useEffect } from 'react';
 
 interface TutorialProps {
@@ -106,7 +109,7 @@ const Tutorial: React.FC<TutorialProps> = ({ onFinish, onStartDummyLeadGeneratio
                 left = Math.max(10, Math.min(left, window.innerWidth - tooltipWidth - 10));
 
                 const newTooltipStyle: React.CSSProperties = {
-                  position: 'fixed', left: `${left}px`, width: `${tooltipWidth}px`, zIndex: 1002, display: 'block',
+                  position: 'fixed', left: `${left}px`, width: `${tooltipWidth}px`, zIndex: Z_INDEX_TOOLTIP, display: 'block',
                 };
                 const newArrowStyle: React.CSSProperties = {
                     position: 'absolute', left: `${targetRect.left + (targetRect.width / 2) - left - 6}px`, width: 0, height: 0,
@@ -174,7 +177,7 @@ const Tutorial: React.FC<TutorialProps> = ({ onFinish, onStartDummyLeadGeneratio
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-black bg-opacity-70">
+    <div className="fixed inset-0 z-[Z_INDEX_OVERLAY] bg-black bg-opacity-70">
       <div style={tooltipStyle} className="bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl p-4 animate-fade-in relative">
         <div style={arrowStyle} />
         <h3 className="font-heading font-bold text-lg mb-2 text-text-primary-light dark:text-text-primary-dark">{tutorialSteps[step].title}</h3>

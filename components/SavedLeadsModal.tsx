@@ -1,3 +1,5 @@
+const Z_INDEX_MODAL = 60;
+
 import React, { useState, useRef } from 'react';
 import { BusinessLead } from '../types';
 import Papa from 'papaparse';
@@ -177,7 +179,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
         onChange={handleFileSelect}
       />
       {showConfirmClear && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 z-[60] flex justify-center items-center p-4" onClick={() => setShowConfirmClear(false)}>
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-[Z_INDEX_MODAL] flex justify-center items-center p-4" onClick={() => setShowConfirmClear(false)}>
             <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
                 <div className="text-center">
                     <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-error-light dark:bg-error-dark">
@@ -213,7 +215,7 @@ const SavedLeadsModal: React.FC<SavedLeadsModalProps> = ({ isOpen, onClose, lead
       )}
 
       {isTextImportOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-[60] flex justify-center items-center p-4" onClick={() => setIsTextImportOpen(false)}>
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-[Z_INDEX_MODAL] flex justify-center items-center p-4" onClick={() => setIsTextImportOpen(false)}>
             <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh] animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
                 <div className="flex justify-between items-center p-4 border-b border-border-light dark:border-border-dark">
                     <h3 className="text-lg font-bold text-text-primary-light dark:text-text-primary-dark">{t('importFromTextTitle')}</h3>
