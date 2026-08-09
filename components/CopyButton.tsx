@@ -1,3 +1,5 @@
+const COPY_TOAST_DURATION = 2000;
+
 
 import React, { useState } from 'react';
 import { ClipboardIcon, CheckIcon } from './icons';
@@ -13,7 +15,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy, t }) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(textToCopy).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopied(false), COPY_TOAST_DURATION); // Reset after 2 seconds
     }).catch(err => {
         console.error("Failed to copy text: ", err);
     });
